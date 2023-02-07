@@ -18,11 +18,12 @@ app.post("/data", (req, res) => {
   // Extract data from request body and store in output.txt
   if (req.body.data)
   {
-    processBody(req.body);
     res.json(["POST Request Received."]);
+    processBody(req.body);
   }
   else 
   {
+    console.log("Invalid request body received.\n" + req.body);
     res.json("Invalid request body.");
   }
 });
@@ -33,9 +34,10 @@ app.listen(3000, () => {
 
 function processBody(data) {
   var latest = fs.createWriteStream("latest.txt");
+  var dataForDate = date.format(new Date(data.data.metrics[0].data[0].date), "MM/DD/YY");
   write(
     latest,
-    date.format(new Date(data.data.metrics[0].data[0].date), "MM/DD/YY") + "\n"
+    dataForDate + "\n"
   );
   data.data.metrics.forEach((element) => {
     switch (element.name) {
@@ -56,6 +58,7 @@ function processBody(data) {
     }
   });
   latest.end();
+  console.log("Export for " + dataForDate + " processed and stored." );
 }
 
 function write(latest, text) {
