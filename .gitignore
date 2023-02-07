@@ -1,3 +1,4 @@
 node_modules
-output.txt
+history.txt
+latest.txt
 package-lock.json
