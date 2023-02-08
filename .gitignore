@@ -2,3 +2,4 @@ node_modules
 history.txt
 latest.txt
 package-lock.json
+*.env
