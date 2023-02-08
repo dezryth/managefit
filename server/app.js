@@ -74,7 +74,11 @@ function write(text) {
 
 function updateBB() {
   // 7:05PM milliseconds snce epoch 1675904700000
-  var scheduleTime = new Date().setTime(1675904700000);
+  var scheduleTime = new Date();
+  scheduleTime.setHours(19);
+  scheduleTime.setMinutes(5);
+  scheduleTime.setSeconds(0);
+  //console.log(scheduleTime);
 
   request(
     {
