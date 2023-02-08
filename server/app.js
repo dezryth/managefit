@@ -45,18 +45,19 @@ function processBody(data) {
   );
   write(dataForDate + "\n");
   data.data.metrics.forEach((element) => {
+    var qty = "No Data";
     switch (element.name) {
       case "step_count":
-        write("Step Count: " + element.data[0].qty + "\n");
+        if (element.data[0].qty) {
+          qty = element.data[0].qty;
+        }
+        write("Step Count: " + qty + "\n");
         break;
       case "weight_body_mass":
-        write(
-          "Weight: " +
-            element.data[0].qty.toFixed(2) +
-            " " +
-            element.units +
-            "s\n"
-        );
+        if (element.data[0].qty) {
+          qty = element.data[0].qty.toFixed(2) + " " + element.units + "s";
+        }
+        write("Weight: " + qty + "\n");
         break;
       default:
     }
