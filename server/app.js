@@ -85,18 +85,22 @@ function updateBB() {
       url: process.env.BB_URL,
       method: "PUT",
       json: {
-        type: "send-message",
-        payload: {
-          chatGuid: process.env.BB_CHATGUID,
-          message: latestMsg,
-          method: "private-api",
+        "type": "send-message",
+        "payload": {
+          "chatGuid": process.env.BB_CHATGUID,
+          "message": latestMsg,
+          "method": "private-api",
         },
-        scheduledFor: scheduleTime,
-        schedule: { type: "recurring", interval: 1, intervalType: "daily" },
+        "scheduledFor": scheduleTime.getTime(),
+        "schedule": { "type": "recurring", "interval": 1, "intervalType": "daily" },
       },
     },
-    () => {
-      console.log("BB Server Updated");
+    (error, response, body) => {
+      console.log("BB Server Updated - Server Response: " + response.statusCode);
+      if (error)
+      {
+        console.log(JSON.stringify(error))
+      }    
     }
   );
 }
