@@ -48,13 +48,13 @@ function processBody(data) {
     var qty = "No Data";
     switch (element.name) {
       case "step_count":
-        if (element.data[0].qty) {
+        if (element.data[0]) {
           qty = element.data[0].qty;
         }
         write("Step Count: " + qty + "\n");
         break;
       case "weight_body_mass":
-        if (element.data[0].qty) {
+        if (element.data[0]) {
           qty = element.data[0].qty.toFixed(2) + " " + element.units + "s";
         }
         write("Weight: " + qty + "\n");
