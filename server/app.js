@@ -39,8 +39,9 @@ app.listen(3000, () => {
 function processBody(data) {
   var latest = fs.createWriteStream("latest.txt");
   latestMsg = "";
+  var datetime = new Date();
   var dataForDate = date.format(
-    new Date(data.data.metrics[0].data[0].date),
+    datetime,
     "MM/DD/YY"
   );
   write(dataForDate + "\n");
@@ -64,7 +65,7 @@ function processBody(data) {
   });
   latest.write(latestMsg);
   latest.end();
-  console.log("Export for " + dataForDate + " processed and stored.");
+  console.log("Export received at " + dataForDate + " " + datetime.toLocaleTimeString() + " has been processed.");
 }
 
 function write(text) {
