@@ -45,9 +45,9 @@ function processRequest(req) {
     "MM/DD/YY"
   );
   write(dataForDate + "\n");
-  if (req.query.user)
+  if (req.headers.user)
   {
-    write(req.query.user + ":\n");
+    write(req.headers.user + ":\n");
   }
   req.body.data.metrics.forEach((element) => {
     var qty = "No Data";
