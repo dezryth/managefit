@@ -24,7 +24,7 @@ app.post("/data", (req, res) => {
   // Extract data from request body and store in output.txt
   if (req.body.data) {
     res.json(["POST Request Received."]);
-    processBody(req.body);
+    processRequest(req);
     updateBB();
   } else {
     console.log("Invalid request body received.\n" + req.body);
@@ -36,7 +36,7 @@ app.listen(3000, () => {
   console.log("Server running on port 3000");
 });
 
-function processBody(data) {
+function processRequest(req) {
   var latest = fs.createWriteStream("latest.txt");
   latestMsg = "";
   var datetime = new Date();
@@ -45,7 +45,11 @@ function processBody(data) {
     "MM/DD/YY"
   );
   write(dataForDate + "\n");
-  data.data.metrics.forEach((element) => {
+  if (req.query.user)
+  {
+    write(req.query.user + ":\n");
+  }
+  req.body.data.metrics.forEach((element) => {
     var qty = "No Data";
     switch (element.name) {
       case "step_count":
