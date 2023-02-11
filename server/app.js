@@ -65,7 +65,7 @@ function processBody(data) {
   });
   latest.write(latestMsg);
   latest.end();
-  console.log("Export received at " + dataForDate + " " + datetime.toLocaleTimeString() + " has been processed.");
+  console.log("Export received at " + dataForDate + " " + datetime.toLocaleTimeString() + " has been processed.\n" + latestMsg);
 }
 
 function write(text) {
