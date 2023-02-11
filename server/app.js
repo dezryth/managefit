@@ -8,8 +8,6 @@ var history = fs.createWriteStream("history.txt", {
   flags: "a",
 });
 
-var lastRequest = fs.createWriteStream("lastRequest.txt");
-
 var latestMsg = "";
 
 var app = express();
@@ -26,7 +24,6 @@ app.post("/data", (req, res) => {
   // Extract data from request body and store in output.txt
   if (req.body.data) {
     res.json(["POST Request Received."]);
-    lastRequest.write(JSON.stringify(req.body.data));
     processRequest(req);
     updateBB();
   } else {
@@ -41,6 +38,7 @@ app.listen(3000, () => {
 
 function processRequest(req) {
   var latest = fs.createWriteStream("latest.txt");
+  var lastRequest = fs.createWriteStream("lastRequest.txt");
   latestMsg = "";
   var datetime = new Date();
   var dataForDate = date.format(
@@ -94,6 +92,8 @@ function processRequest(req) {
   });
   latest.write(latestMsg);
   latest.end();
+  lastRequest.write(JSON.stringify(req.body.data));
+  lastRequest.end();
   console.log("Export received at " + dataForDate + " " + datetime.toLocaleTimeString() + " has been processed.\n" + latestMsg);
 }
 
