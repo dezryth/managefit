@@ -67,6 +67,28 @@ function processRequest(req) {
         }
         write("Weight: " + qty + "\n");
         break;
+        case "body_mass_index":
+          if (element.data[0]){
+            qty = element.data[0].qty.toFixed(2)
+            var desc = "";
+            if (qty > 30)
+            {
+              desc = "Obese";
+            }
+            else if (qty > 25) 
+            {
+              desc = "Overweight";
+            }
+            else if (qty > 18.5)
+            {
+              desc = "Healthy";
+            }
+            else
+            {
+              desc = "Underweight";
+            }
+            write("BMI: " + qty + " - " + desc + "\n");
+          }
       default:
     }
   });
