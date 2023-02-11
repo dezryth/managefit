@@ -41,13 +41,9 @@ function processRequest(req) {
   var lastRequest = fs.createWriteStream("lastRequest.txt");
   latestMsg = "";
   var datetime = new Date();
-  var dataForDate = date.format(
-    datetime,
-    "MM/DD/YY"
-  );
+  var dataForDate = date.format(datetime, "MM/DD/YY");
   write(dataForDate + "\n");
-  if (req.headers.user)
-  {
+  if (req.headers.user) {
     write(req.headers.user + ":\n");
   }
   req.body.data.metrics.forEach((element) => {
@@ -65,39 +61,34 @@ function processRequest(req) {
         }
         write("Weight: " + qty + "\n");
         break;
-        case "body_mass_index":
-          if (element.data[0]){
-            qty = element.data[0].qty.toFixed(2)
-            var desc = "";
-            if (qty > 30)
-            {
-              desc = "Obese";
-            }
-            else if (qty > 25) 
-            {
-              desc = "Overweight";
-            }
-            else if (qty > 18.5)
-            {
-              desc = "Healthy";
-            }
-            else
-            {
-              desc = "Underweight";
-            }
-            write("BMI: " + qty + " - " + desc + "\n");
+      case "body_mass_index":
+        if (element.data[0]) {
+          qty = element.data[0].qty.toFixed(2);
+          if (qty > 30) {
+            qty += " - Obese";
+          } else if (qty > 25) {
+            qty += " - Overweight";
+          } else if (qty > 18.5) {
+            qty += " - Healthy";
+          } else {
+            qty += " - Underweight";
           }
-          else
-          {
-            write("BMI: " + qty + "\n");
-          }
+        }
+        write("BMI: " + qty + "\n");
     }
   });
   latest.write(latestMsg);
   latest.end();
   lastRequest.write(JSON.stringify(req.body.data));
   lastRequest.end();
-  console.log("Export received at " + dataForDate + " " + datetime.toLocaleTimeString() + " has been processed.\n" + latestMsg);
+  console.log(
+    "Export received at " +
+      dataForDate +
+      " " +
+      datetime.toLocaleTimeString() +
+      " has been processed.\n" +
+      latestMsg
+  );
 }
 
 function write(text) {
@@ -118,22 +109,23 @@ function updateBB() {
       url: process.env.BB_URL,
       method: "PUT",
       json: {
-        "type": "send-message",
-        "payload": {
-          "chatGuid": process.env.BB_CHATGUID,
-          "message": latestMsg,
-          "method": "private-api",
+        type: "send-message",
+        payload: {
+          chatGuid: process.env.BB_CHATGUID,
+          message: latestMsg,
+          method: "private-api",
         },
-        "scheduledFor": scheduleTime.getTime(),
-        "schedule": { "type": "recurring", "interval": 1, "intervalType": "daily" },
+        scheduledFor: scheduleTime.getTime(),
+        schedule: { type: "recurring", interval: 1, intervalType: "daily" },
       },
     },
     (error, response, body) => {
-      console.log("BB Server Updated - Server Response: " + response.statusCode);
-      if (error)
-      {
-        console.log(JSON.stringify(error))
-      }    
+      console.log(
+        "BB Server Updated - Server Response: " + response.statusCode
+      );
+      if (error) {
+        console.log(JSON.stringify(error));
+      }
     }
   );
 }
