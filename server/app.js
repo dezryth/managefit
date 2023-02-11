@@ -8,6 +8,8 @@ var history = fs.createWriteStream("history.txt", {
   flags: "a",
 });
 
+var lastRequest = fs.createWriteStream("lastRequest.txt");
+
 var latestMsg = "";
 
 var app = express();
@@ -24,6 +26,7 @@ app.post("/data", (req, res) => {
   // Extract data from request body and store in output.txt
   if (req.body.data) {
     res.json(["POST Request Received."]);
+    lastRequest.write(JSON.stringify(req.body.data));
     processRequest(req);
     updateBB();
   } else {
