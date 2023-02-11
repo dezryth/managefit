@@ -87,7 +87,10 @@ function processRequest(req) {
             }
             write("BMI: " + qty + " - " + desc + "\n");
           }
-      default:
+          else
+          {
+            write("BMI: " + qty + "\n");
+          }
     }
   });
   latest.write(latestMsg);
