@@ -50,7 +50,7 @@ function processBody(data) {
     switch (element.name) {
       case "step_count":
         if (element.data[0]) {
-          qty = element.data[0].qty;
+          qty = element.data[0].qty.toFixed(0);
         }
         write("Step Count: " + qty + "\n");
         break;
