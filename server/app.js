@@ -120,9 +120,11 @@ function updateBB() {
       },
     },
     (error, response, body) => {
-      console.log(
-        "BB Server Updated - Server Response: " + response.statusCode
-      );
+      if (response) {
+        console.log(
+          "BB Server Updated - Server Response: " + response.statusCode
+        );
+      }
       if (error) {
         console.log(JSON.stringify(error));
       }
