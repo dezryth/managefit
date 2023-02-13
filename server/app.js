@@ -121,9 +121,9 @@ function updateBB() {
     },
     (error, response, body) => {
       if (response) {
-        console.log(
-          "BB Server Response: " + response.statusCode
-        );
+        console.log("BB Server Response: " + response.statusCode);
+      } else {
+        console.log("No response from BB server.");
       }
       if (error) {
         console.log(JSON.stringify(error));
