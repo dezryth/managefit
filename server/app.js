@@ -122,7 +122,7 @@ function updateBB() {
     (error, response, body) => {
       if (response) {
         console.log(
-          "BB Server Updated - Server Response: " + response.statusCode
+          "BB Server Response: " + response.statusCode
         );
       }
       if (error) {
