@@ -53,7 +53,7 @@ function processRequest(req) {
         if (element.data[0]) {
           qty = element.data[0].qty.toFixed(0);
         }
-        write("Step Count: " + qty + "\n");
+        write("Step Count: " + qty + " as of " + datetime.toLocaleTimeString() + "\n");
         break;
       case "weight_body_mass":
         if (element.data[0]) {
@@ -81,14 +81,7 @@ function processRequest(req) {
   latest.end();
   lastRequest.write(JSON.stringify(req.body.data));
   lastRequest.end();
-  console.log(
-    "Export received at " +
-      dataForDate +
-      " " +
-      datetime.toLocaleTimeString() +
-      " has been processed.\n" +
-      latestMsg
-  );
+  console.log(latestMsg);  
 }
 
 function write(text) {
@@ -102,7 +95,12 @@ function updateBB() {
   scheduleTime.setHours(19);
   scheduleTime.setMinutes(5);
   scheduleTime.setSeconds(0);
-  //console.log(scheduleTime);
+
+  // If current time is after the normal schedule time, schedule for the following day
+  if (new Date() > scheduleTime)
+  {    
+    scheduleTime.setDate(scheduleTime.getDate() + 1);
+  }  
 
   request(
     {
