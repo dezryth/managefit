@@ -49,18 +49,6 @@ function processRequest(req) {
   req.body.data.metrics.forEach((element) => {
     var qty = "No Data";
     switch (element.name) {
-      case "step_count":
-        if (element.data[0]) {
-          qty = element.data[0].qty.toFixed(0);
-        }
-        write("Step Count: " + qty + " as of " + datetime.toLocaleTimeString() + "\n");
-        break;
-      case "weight_body_mass":
-        if (element.data[0]) {
-          qty = element.data[0].qty.toFixed(2) + " " + element.units + "s";
-        }
-        write("Weight: " + qty + "\n");
-        break;
       case "body_mass_index":
         if (element.data[0]) {
           qty = element.data[0].qty.toFixed(2);
@@ -75,13 +63,32 @@ function processRequest(req) {
           }
         }
         write("BMI: " + qty + "\n");
+        break;
+      case "step_count":
+        if (element.data[0]) {
+          qty = element.data[0].qty.toFixed(0) + " as of " + datetime.toLocaleTimeString();
+        }
+        write("Step Count: " + qty + "\n");
+        break;
+      case "vo2_max":
+        if (element.data[0]) {
+          qty = element.data[0].qty.toFixed(2);
+        }
+        write("VO₂ Max: " + qty + "\n");
+        break;
+      case "weight_body_mass":
+        if (element.data[0]) {
+          qty = element.data[0].qty.toFixed(2) + " " + element.units + "s";
+        }
+        write("Weight: " + qty + "\n");
+        break;
     }
   });
   latest.write(latestMsg);
   latest.end();
   lastRequest.write(JSON.stringify(req.body.data));
   lastRequest.end();
-  console.log(latestMsg);  
+  console.log(latestMsg);
 }
 
 function write(text) {
