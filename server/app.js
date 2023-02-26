@@ -131,10 +131,9 @@ function randomInteger(min, max) {
 }
 
 function updateBB() {
-  // 7:05PM milliseconds snce epoch 1675904700000
   var scheduleTime = new Date();
   scheduleTime.setHours(19);
-  scheduleTime.setMinutes(5);
+  scheduleTime.setMinutes(0);
   scheduleTime.setSeconds(0);
 
   // If current time is after the normal schedule time, schedule for the following day
