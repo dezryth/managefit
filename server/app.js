@@ -66,6 +66,14 @@ function processRequest(req) {
         }
         write("BMI: " + qty + "\n");
         break;
+      case "dietary_energy":
+        if (element.data[0]) {
+            qty = element.data[0].qty.toFixed(0) +
+            " as of " +
+            datetime.toLocaleTimeString();
+          }
+          write("Calories Consumed: " + qty + "\n");
+          break;
       case "step_count":
         if (element.data[0]) {
           qty =
