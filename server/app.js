@@ -9,6 +9,7 @@ var history = fs.createWriteStream("history.txt", {
 });
 
 var latestMsg = "";
+var quotes;
 
 var app = express();
 
@@ -33,6 +34,7 @@ app.post("/data", (req, res) => {
 });
 
 app.listen(3000, () => {
+  initialize();
   console.log("Server running on port 3000");
 });
 
@@ -42,7 +44,7 @@ function processRequest(req) {
   latestMsg = "";
   var datetime = new Date();
   var dataForDate = date.format(datetime, "MM/DD/YY");
-  write(dataForDate + "\n");
+  write("FAB Check In:\n" + dataForDate + "\n");
   if (req.headers.user) {
     write(req.headers.user + ":\n");
   }
@@ -66,15 +68,18 @@ function processRequest(req) {
         break;
       case "step_count":
         if (element.data[0]) {
-          qty = element.data[0].qty.toFixed(0) + " as of " + datetime.toLocaleTimeString();
+          qty =
+            element.data[0].qty.toFixed(0) +
+            " as of " +
+            datetime.toLocaleTimeString();
         }
         write("Step Count: " + qty + "\n");
         break;
-      case "vo2_max":
+      case "vo2_max": // Only add to message if data is present. This is often missing in data exports.
         if (element.data[0]) {
           qty = element.data[0].qty.toFixed(2);
+          write("VO₂ Max: " + qty + "\n");
         }
-        write("VO₂ Max: " + qty + "\n");
         break;
       case "weight_body_mass":
         if (element.data[0]) {
@@ -84,6 +89,7 @@ function processRequest(req) {
         break;
     }
   });
+  write("\n" + getInspiration());
   latest.write(latestMsg);
   latest.end();
   lastRequest.write(JSON.stringify(req.body.data));
@@ -91,9 +97,30 @@ function processRequest(req) {
   console.log(latestMsg);
 }
 
-function write(text) {
-  latestMsg += text;
-  history.write(text);
+function getInspiration() {
+  var position = randomInteger(0, 1642); // There are 1643 inspirational quotes in our quotes file.
+  var inspiration = "'" + quotes[position].text;
+  // Some quotes don't have an author, so don't specify one if null
+  if (quotes[position].author) {
+    inspiration += "' - " + quotes[position].author;
+  }
+
+  return inspiration;
+}
+
+function initialize() {
+  fs.readFile("./inspirationalQuotes.json", "utf8", (err, data) => {
+    if (err) {
+      console.log(`Error reading file from disk: ${err}`);
+    } else {
+      // parse JSON string to JSON object
+      quotes = JSON.parse(data);
+    }
+  });
+}
+
+function randomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function updateBB() {
@@ -104,10 +131,9 @@ function updateBB() {
   scheduleTime.setSeconds(0);
 
   // If current time is after the normal schedule time, schedule for the following day
-  if (new Date() > scheduleTime)
-  {    
+  if (new Date() > scheduleTime) {
     scheduleTime.setDate(scheduleTime.getDate() + 1);
-  }  
+  }
 
   request(
     {
@@ -135,4 +161,9 @@ function updateBB() {
       }
     }
   );
+}
+
+function write(text) {
+  latestMsg += text;
+  history.write(text);
 }
