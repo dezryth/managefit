@@ -106,14 +106,13 @@ function processRequest(req) {
 
 function getInspiration() {
   var position = randomInteger(0, 1642); // There are 1643 inspirational quotes in our quotes file.
-  var quote = quotes[position].text.replace("'", "");
-  var inspiration = "'" + quote + "'";
+  var quote = quotes[position].text;
   // Some quotes don't have an author, so don't specify one if null
   if (quotes[position].author) {
     inspiration += " - " + quotes[position].author;
   }
 
-  return inspiration;
+  return quote;
 }
 
 function initialize() {
