@@ -44,7 +44,10 @@ function processRequest(req) {
   latestMsg = "";
   var datetime = new Date();
   var dataForDate = date.format(datetime, "MM/DD/YY");
-  write("FAB Check In:\n" + dataForDate + "\n");
+  write("FAB Check In:\n" + dataForDate + 
+    " as of " +
+    datetime.toLocaleTimeString() +
+    "\n");
   if (req.headers.user) {
     write(req.headers.user + ":\n");
   }
@@ -68,18 +71,14 @@ function processRequest(req) {
         break;
       case "dietary_energy":
         if (element.data[0]) {
-            qty = element.data[0].qty.toFixed(0) +
-            " as of " +
-            datetime.toLocaleTimeString();
-          }
+          qty = element.data[0].qty.toFixed(0);
           write("Calories Consumed: " + qty + "\n");
-          break;
+        }
+        break;
       case "step_count":
         if (element.data[0]) {
           qty =
-            element.data[0].qty.toFixed(0) +
-            " as of " +
-            datetime.toLocaleTimeString();
+            element.data[0].qty.toFixed(0);
         }
         write("Step Count: " + qty + "\n");
         break;
