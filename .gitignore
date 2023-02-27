@@ -4,3 +4,4 @@ latest.txt
 lastRequest.txt
 package-lock.json
 *.env
+updates/*

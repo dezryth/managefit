@@ -1,7 +1,9 @@
 var express = require("express"),
   fs = require("fs"),
   request = require("request"),
-  date = require("date-and-time");
+  date = require("date-and-time"),
+  path = require('path'),
+  logger = require('morgan');
 require("dotenv").config();
 
 var history = fs.createWriteStream("history.txt", {
@@ -11,15 +13,26 @@ var history = fs.createWriteStream("history.txt", {
 var latestMsg = "";
 var quotes;
 
-var app = express();
+const indexRouter = require('./routes/index');
+const checkinRouter = require('./routes/checkin');
+
+const app = express();
 
 // This enables request body parsing
 app.use(express.json({ limit: "1mb" }));
 
-app.get("/", (req, res) => {
-  console.log("GET Request received on /test interface.");
-  res.json(["The server is up."]);
-});
+// Enable logger
+//app.use(logger('dev'));
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug')
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Route handling
+app.use('/', indexRouter);
+app.use('/checkin', checkinRouter);
 
 app.post("/data", (req, res) => {
   // Extract data from request body and store in output.txt
