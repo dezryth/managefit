@@ -2,8 +2,8 @@ var express = require("express"),
   fs = require("fs"),
   request = require("request"),
   date = require("date-and-time"),
-  path = require('path'),
-  logger = require('morgan');
+  path = require("path"),
+  logger = require("morgan");
 require("dotenv").config();
 
 var history = fs.createWriteStream("history.txt", {
@@ -13,8 +13,8 @@ var history = fs.createWriteStream("history.txt", {
 var latestMsg = "";
 var quotes;
 
-const indexRouter = require('./routes/index');
-const checkinRouter = require('./routes/checkin');
+const indexRouter = require("./routes/index");
+const checkinRouter = require("./routes/checkin");
 
 const app = express();
 
@@ -25,14 +25,16 @@ app.use(express.json({ limit: "1mb" }));
 //app.use(logger('dev'));
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug')
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "pug");
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use(express.urlencoded({ extended: false }));
 
 // Route handling
-app.use('/', indexRouter);
-app.use('/checkin', checkinRouter);
+app.use("/", indexRouter);
+app.use("/checkin", checkinRouter);
 
 app.post("/data", (req, res) => {
   // Extract data from request body and store in output.txt
@@ -43,6 +45,16 @@ app.post("/data", (req, res) => {
   } else {
     console.log("Invalid request body received.\n" + req.body);
     res.json("Invalid request body.");
+  }
+});
+
+app.post("/admin/sendmessages", (req, res) => {
+  if (req.query.password == process.env.FAB_PASS) {
+    sendCheckInMessages();
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(401);
+    console.log("Unauthorized attempt to access admin/sendmessages endpoint.");
   }
 });
 
@@ -57,10 +69,13 @@ function processRequest(req) {
   latestMsg = "";
   var datetime = new Date();
   var dataForDate = date.format(datetime, "MM/DD/YY");
-  write("FAB Check In:\n" + dataForDate + 
-    " as of " +
-    datetime.toLocaleTimeString() +
-    "\n");
+  write(
+    "FAB Check In:\n" +
+      dataForDate +
+      " as of " +
+      datetime.toLocaleTimeString() +
+      "\n"
+  );
   if (req.headers.user) {
     write(req.headers.user + ":\n");
   }
@@ -90,8 +105,7 @@ function processRequest(req) {
         break;
       case "step_count":
         if (element.data[0]) {
-          qty =
-            element.data[0].qty.toFixed(0);
+          qty = element.data[0].qty.toFixed(0);
         }
         write("Step Count: " + qty + "\n");
         break;
@@ -131,7 +145,7 @@ function getInspiration() {
 function initialize() {
   fs.readFile("./inspirationalQuotes.json", "utf8", (err, data) => {
     if (err) {
-      console.log(`Error reading file from disk: ${err}`);
+      console.log("Error reading file from disk: ${err}");
     } else {
       // parse JSON string to JSON object
       quotes = JSON.parse(data);
@@ -141,6 +155,50 @@ function initialize() {
 
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function sendCheckInMessages() {
+  var files = fs.readdirSync("updates/");
+
+  if (files.length > 0) {
+    for (const file of files) {
+      // Read file contents
+      var text = fs.readFileSync("updates/" + file, "utf8");
+      
+      // Send message with file contents
+      sendFABMessage(text);
+      
+      // Delete file once done
+      fs.rmSync("updates/" + file, {
+        force: true,
+      });
+    }
+  }
+}
+
+function sendFABMessage(text) {
+  request(
+    {
+      url: process.env.BB_SENDMESSAGEURL,
+      method: "POST",
+      json: {
+        method: "private-api",
+        chatGuid: process.env.BB_CHATGUID,
+        message: text,
+        effectID: "com.apple.MobileSMS.expressivesend.invisibleink",
+      },
+    },
+    (error, response) => {
+      if (response) {
+        console.log("BB Server Response: " + response.statusCode);
+      } else {
+        console.log("No response from BB server.");
+      }
+      if (error) {
+        console.log(JSON.stringify(error));
+      }
+    }
+  );
 }
 
 function updateBB() {
@@ -156,7 +214,7 @@ function updateBB() {
 
   request(
     {
-      url: process.env.BB_URL,
+      url: process.env.BB_UPDATESCHEDULEDMESSAGEURL,
       method: "PUT",
       json: {
         type: "send-message",

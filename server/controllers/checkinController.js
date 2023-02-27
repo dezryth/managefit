@@ -1,9 +1,10 @@
 const { body, validationResult } = require("express-validator");
+var date = require("date-and-time");
+var fs = require("fs");
 
 // Display checkin form on GET.
 exports.checkin_get = function (req, res, next) {
   var password = req.query.password;
-  console.log(password);
   res.render("checkin", {
     name: "",
     weight: "",
@@ -36,7 +37,7 @@ exports.checkin_post = [
 
     if (!errors.isEmpty()) {
       // There are errors. Render form again with sanitized values/error messages.
-      console.log("Form submitted with errors.");
+      console.log("Form submitted with errors.\n" + errors);
       res.render("checkin", {
         user: req.body.user,
         weight: req.body.weight,
@@ -47,7 +48,24 @@ exports.checkin_post = [
       });
       return;
     } else {
+      // If updates folder doesn't exist, create it
+      if (!fs.existsSync("updates")){
+        fs.mkdirSync("updates");
+      }
+
       // Create a checkin text file in updates folder
+      var today = date.format(new Date(), "MM-DD-YY")
+      var checkinFile = fs.createWriteStream("updates/" + today + req.body.user.toLowerCase() + ".txt");
+      var checkinMessage = date.format(new Date(), "MM/DD/YY") + "\n" + req.body.user + ":\n" + 
+        (req.body.weight ? "Weight: " + req.body.weight + "\n" : "") +
+        (req.body.activity ? "Activity: " + req.body.activity + "\n" : "") +
+        (req.body.update ? "Update: " + req.body.update : "")
+      
+      checkinFile.write(checkinMessage);
+      checkinFile.end();
+      
+      console.log(checkinMessage);
+
       console.log("Form submitted successfully.");
       //TODO
       // Successful - redirect to thanks page.

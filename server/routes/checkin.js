@@ -1,14 +1,16 @@
 var express = require("express");
 var router = express.Router();
 
-// Require our checkin controller
 var checkin_controller = require('../controllers/checkinController');
 
-// checkin Routes
-
-// checkin Form.
+//// Route Handling for checkin
+// Form - GET
 router.get("/", checkin_controller.checkin_get);
-router.get("/thanks", checkin_controller.checkin_thanks_get)
+
+// Form - POST
 router.post("/", checkin_controller.checkin_post);
+
+// Form Confirmation - GET
+router.get("/thanks", checkin_controller.checkin_thanks_get)
 
 module.exports = router;
