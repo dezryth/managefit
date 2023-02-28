@@ -58,7 +58,7 @@ exports.checkin_post = [
 
     if (!errors.isEmpty()) {
       // There are errors. Render form again with sanitized values/error messages.
-      console.log("Form submitted with errors.\n" + errors);
+      console.log("Form submitted with errors.\n" + JSON.stringify(errors));
       res.render("checkin", {
         title: "FAB Check In!",
         user: req.body.user,
