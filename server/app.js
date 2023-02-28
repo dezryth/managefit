@@ -162,11 +162,16 @@ function sendCheckInMessages() {
 
   if (files.length > 0) {
     for (const file of files) {
-      // Read file contents
+      // Read file contents - store effect from first line
       var text = fs.readFileSync("updates/" + file, "utf8");
+      var endOfFirstLine = text.indexOf("\n");
+      var effect = text.substring(0, endOfFirstLine);
+      
+      // Remove first line from text
+      text = text.substring(endOfFirstLine + 1);
       
       // Send message with file contents
-      sendFABMessage(text);
+      sendFABMessage(text, effect);
       
       // Delete file once done
       fs.rmSync("updates/" + file, {
@@ -176,7 +181,7 @@ function sendCheckInMessages() {
   }
 }
 
-function sendFABMessage(text) {
+function sendFABMessage(text, effect) {
   request(
     {
       url: process.env.BB_SENDMESSAGEURL,
@@ -185,7 +190,7 @@ function sendFABMessage(text) {
         method: "private-api",
         chatGuid: process.env.BB_CHATGUID,
         message: text,
-        effectId: "com.apple.MobileSMS.expressivesend.invisibleink",
+        effectId: effect,
       },
     },
     (error, response) => {

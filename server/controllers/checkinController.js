@@ -2,6 +2,22 @@ const { body, validationResult } = require("express-validator");
 var date = require("date-and-time");
 var fs = require("fs");
 
+const effects = {
+  "none": "",
+  "slam": "com.apple.MobileSMS.expressivesend.impact",
+  "loud": "com.apple.MobileSMS.expressivesend.loud",
+  "gentle": "com.apple.MobileSMS.expressivesend.gentle",
+  "invisible ink": "com.apple.MobileSMS.expressivesend.invisibleink",
+  "echo": "com.apple.messages.effect.CKEchoEffect",
+  "spotlight": "com.apple.messages.effect.CKSpotlightEffect",
+  "balloons": "com.apple.messages.effect.CKHappyBirthdayEffect",
+  "confetti": "com.apple.messages.effect.CKConfettiEffect",
+  "love": "com.apple.messages.effect.CKHeartEffect",
+  "lasers": "com.apple.messages.effect.CKLasersEffect",
+  "fireworks": "com.apple.messages.effect.CKFireworksEffect",
+  "celebration": "com.apple.messages.effect.CKSparklesEffect",
+};
+
 // Display checkin form on GET.
 exports.checkin_get = function (req, res, next) {
   var password = req.query.password;
@@ -10,6 +26,7 @@ exports.checkin_get = function (req, res, next) {
     weight: "",
     activity: "",
     update: "",
+    effects: effects,
     parameterPW: password,
   });
 };
@@ -46,6 +63,7 @@ exports.checkin_post = [
         weight: req.body.weight,
         activity: req.body.activity,
         update: req.body.update,
+        effects: effects,
         parameterPW: req.body.password,
         errors: errors.array(),
       });
@@ -59,19 +77,15 @@ exports.checkin_post = [
       // Create a checkin text file in updates folder
       var today = date.format(new Date(), "MM-DD-YY")
       var checkinFile = fs.createWriteStream("updates/" + today + req.body.user.toLowerCase() + ".txt");
-      var checkinMessage = date.format(new Date(), "MM/DD/YY") + "\n" + req.body.user + ":\n" + 
+      var checkinMessage = req.body.effect + "\n" +
+        date.format(new Date(), "MM/DD/YY") + "\n" + req.body.user + ":\n" + 
         (req.body.weight ? "Weight: " + req.body.weight + "\n" : "") +
         (req.body.activity ? "Activity: " + req.body.activity + "\n" : "") +
         (req.body.update ? "Update: " + req.body.update : "")
       
       checkinFile.write(checkinMessage);
       checkinFile.end();
-      
-      console.log(checkinMessage);
-
-      console.log("Form submitted successfully.");
-      //TODO
-      // Successful - redirect to thanks page.
+      console.log("Form submitted successfully.\n" + checkinMessage);
       res.redirect("/checkin/thanks?user=" + req.body.user);
     }
   },
