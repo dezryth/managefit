@@ -26,6 +26,9 @@ exports.checkin_thanks_get = function (req, res, next) {
 exports.checkin_post = [
   // Validate and sanitize fields.
   body("user", "Name must not be empty.").trim().isLength({ min: 1 }).escape(),
+  body("weight", "Max characters exceeded in Weight - 500.").trim().isLength({ max: 500 }).escape(),
+  body("activity", "Max characters exceeded in Activity - 500.").trim().isLength({ max: 500 }).escape(),
+  body("update", "Max characters exceeded in Update - 500.").trim().isLength({ max: 500 }).escape(),
   body("password", "You are not authorized for this form.")
     .trim()
     .equals(process.env.FAB_PASS)

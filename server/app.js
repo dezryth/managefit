@@ -94,8 +94,8 @@ function processRequest(req) {
           } else {
             qty += " - Underweight";
           }
+          write("BMI: " + qty + "\n");
         }
-        write("BMI: " + qty + "\n");
         break;
       case "dietary_energy":
         if (element.data[0]) {
@@ -185,7 +185,7 @@ function sendFABMessage(text) {
         method: "private-api",
         chatGuid: process.env.BB_CHATGUID,
         message: text,
-        effectID: "com.apple.MobileSMS.expressivesend.invisibleink",
+        effectId: "com.apple.MobileSMS.expressivesend.invisibleink",
       },
     },
     (error, response) => {
