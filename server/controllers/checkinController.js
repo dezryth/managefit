@@ -22,6 +22,7 @@ const effects = {
 exports.checkin_get = function (req, res, next) {
   var password = req.query.password;
   res.render("checkin", {
+    title: "FAB Check In!",
     name: "",
     weight: "",
     activity: "",
@@ -59,6 +60,7 @@ exports.checkin_post = [
       // There are errors. Render form again with sanitized values/error messages.
       console.log("Form submitted with errors.\n" + errors);
       res.render("checkin", {
+        title: "FAB Check In!",
         user: req.body.user,
         weight: req.body.weight,
         activity: req.body.activity,
