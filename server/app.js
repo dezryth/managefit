@@ -173,10 +173,11 @@ function sendCheckInMessages() {
       // Send message with file contents
       setTimeout(sendFABMessage(text, effect), 15000);
       
-      // Delete file once done
-      fs.rmSync("updates/" + file, {
-         force: true,
-      });
+      // Make archive folder if doesnt exist.
+      
+      
+      // Move file once done
+      fs.renameSync("archive/" + file, "updates/" + file);
     }
   }
 }
