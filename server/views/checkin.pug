@@ -29,3 +29,6 @@ block content
     ul
       for error in errors
         li.text-danger!= error.msg
+
+  br
+  p='Updates shared before ' + shareTime + ' will post at ' + shareTime + '. Updates shared after '+ shareTime +' will post tomorrow.'

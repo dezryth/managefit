@@ -2,6 +2,8 @@ const { body, validationResult } = require("express-validator");
 var date = require("date-and-time");
 var fs = require("fs");
 
+const shareTime = process.env.SHARE_TIME;
+
 const effects = {
   "none": "",
   "slam": "com.apple.MobileSMS.expressivesend.impact",
@@ -28,7 +30,8 @@ exports.checkin_get = function (req, res, next) {
     activity: "",
     update: "",
     effects: effects,
-    parameterPW: password,
+    parameterPW: password,    
+    shareTime: shareTime
   });
 };
 
