@@ -173,10 +173,10 @@ function sendCheckInMessages() {
       // Send message with file contents
       setTimeout(sendFABMessage(text, effect), 15000);
       
-      // Delete file once done (Commenting out until all potential bugs wrt emojis etc ironed out.)
-      // fs.rmSync("updates/" + file, {
-      //   force: true,
-      //});
+      // Delete file once done
+      fs.rmSync("updates/" + file, {
+         force: true,
+      });
     }
   }
 }
