@@ -173,8 +173,10 @@ function sendCheckInMessages() {
       // Send message with file contents
       setTimeout(sendFABMessage(text, effect), 15000);
       
-      // Make archive folder if doesnt exist.
-      
+      // If archive folder doesn't exist, create it
+      if (!fs.existsSync("archive")){
+        fs.mkdirSync("archive");
+      }
       
       // Move file once done
       fs.renameSync("archive/" + file, "updates/" + file);
