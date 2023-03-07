@@ -1,6 +1,7 @@
 const { body, validationResult } = require("express-validator");
 var date = require("date-and-time");
 var fs = require("fs");
+var he = require("he");
 
 const shareTime = process.env.SHARE_TIME;
 
@@ -83,10 +84,10 @@ exports.checkin_post = [
       var today = date.format(new Date(), "MM-DD-YY")
       var checkinFile = fs.createWriteStream("updates/" + today + req.body.user.toLowerCase() + ".txt");
       var checkinMessage = req.body.effect + "\n" +
-        date.format(new Date(), "MM/DD/YY") + "\n" + req.body.user + ":\n" + 
-        (req.body.weight ? "Weight: " + req.body.weight + "\n" : "") +
-        (req.body.activity ? "Activity: " + req.body.activity + "\n" : "") +
-        (req.body.update ? "Update: " + req.body.update : "")
+        date.format(new Date(), "MM/DD/YY") + "\n" + he.decode(req.body.user) + ":\n" + 
+        (req.body.weight ? "Weight: " + he.decode(req.body.weight) + "\n" : "") +
+        (req.body.activity ? "Activity: " + he.decode(req.body.activity) + "\n" : "") +
+        (req.body.update ? "Update: " + he.decode(req.body.update) : "")
       
       checkinFile.write(checkinMessage);
       checkinFile.end();
