@@ -171,7 +171,7 @@ function sendCheckInMessages() {
       text = text.substring(endOfFirstLine + 1);
       
       // Send message with file contents
-      setTimeout(sendFABMessage(text, effect), 15000);
+      sendFABMessage(text, effect);
       
       // If archive folder doesn't exist, create it
       if (!fs.existsSync("archive")){
