@@ -179,7 +179,7 @@ function sendCheckInMessages() {
       }
       
       // Move file once done
-      fs.renameSync("archive/" + file, "updates/" + file);
+      fs.renameSync("updates/" + file, "archive/" + file);
     }
   }
 }
