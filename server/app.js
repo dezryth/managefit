@@ -67,13 +67,14 @@ function processRequest(req) {
   var latest = fs.createWriteStream("latest.txt");
   var lastRequest = fs.createWriteStream("lastRequest.txt");
   latestMsg = "";
-  var datetime = new Date();
-  var dataForDate = date.format(datetime, "MM/DD/YY");
+  var today = new Date();
+  var yesterday = new Date();
+  yesterday.setDate(today.getDate() -1); 
+  // Currently expecting data for yesterday
+  var formattedDate = date.format(yesterday, "MM/DD/YY");
   write(
     "FAB Check In:\n" +
-      dataForDate +
-      " as of " +
-      datetime.toLocaleTimeString() +
+      formattedDate +
       "\n"
   );
   if (req.headers.user) {
