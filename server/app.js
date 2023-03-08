@@ -211,13 +211,13 @@ function sendFABMessage(text, effect) {
 
 function updateBB() {
   var scheduleTime = new Date();
-  scheduleTime.setHours(19);
+  scheduleTime.setHours(12);
   scheduleTime.setMinutes(0);
   scheduleTime.setSeconds(0);
 
-  // If current time is after the normal schedule time, schedule for the following day
+  // If current time is after the normal schedule time, cancel update.
   if (new Date() > scheduleTime) {
-    scheduleTime.setDate(scheduleTime.getDate() + 1);
+    return;
   }
 
   request(
