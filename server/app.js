@@ -68,7 +68,7 @@ function processRequest(req) {
   var lastRequest = fs.createWriteStream("lastRequest.txt");
   latestMsg = "";
   var datetime = new Date();
-  var dataForDate = date.setDate(date.getDate() - 1).format(datetime, "MM/DD/YY");
+  var dataForDate = datetime.setDate(datetime.getDate() - 1).format(datetime, "MM/DD/YY");
   write(
     "FAB Check In:\n" +
       dataForDate +
