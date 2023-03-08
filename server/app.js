@@ -68,12 +68,10 @@ function processRequest(req) {
   var lastRequest = fs.createWriteStream("lastRequest.txt");
   latestMsg = "";
   var datetime = new Date();
-  var dataForDate = date.format(datetime, "MM/DD/YY");
+  var dataForDate = date.setDate(date.getDate() - 1).format(datetime, "MM/DD/YY");
   write(
     "FAB Check In:\n" +
       dataForDate +
-      " as of " +
-      datetime.toLocaleTimeString() +
       "\n"
   );
   if (req.headers.user) {
