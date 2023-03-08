@@ -71,7 +71,7 @@ function processRequest(req) {
   var yesterday = new Date();
   yesterday.setDate(today.getDate() -1); 
   // Currently expecting data for yesterday
-  var formattedDate = yesterday.format(datetime, "MM/DD/YY");
+  var formattedDate = date.format(yesterday, "MM/DD/YY");
   write(
     "FAB Check In:\n" +
       formattedDate +
