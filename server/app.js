@@ -69,14 +69,10 @@ function processRequest(req) {
   latestMsg = "";
   var today = new Date();
   var yesterday = new Date();
-  yesterday.setDate(today.getDate() -1); 
+  yesterday.setDate(today.getDate() - 1);
   // Currently expecting data for yesterday
   var formattedDate = date.format(yesterday, "MM/DD/YY");
-  write(
-    "FAB Check In:\n" +
-      formattedDate +
-      "\n"
-  );
+  write("FAB Check In:\n" + formattedDate + "\n");
   if (req.headers.user) {
     write(req.headers.user + ":\n");
   }
@@ -101,13 +97,23 @@ function processRequest(req) {
       case "dietary_energy":
         if (element.data[0]) {
           qty = element.data[0].qty.toFixed(0);
-          write("Calories Consumed: " + qty + "\n");
         }
+        // If no dietary_energy data, roast.
+        else {
+          qty = "Didn't track anything.";
+        }
+        write("Calories Consumed: " + qty + "\n");
         break;
       case "step_count":
         if (element.data[0]) {
           qty = element.data[0].qty.toFixed(0);
+
+          // Check if step count is less than 1000 and roast, if so.
+          if (qty < 1000) {
+            qty = "Not worth mentioning. Lazy ass.";
+          }
         }
+
         write("Step Count: " + qty + "\n");
         break;
       case "vo2_max": // Only add to message if data is present. This is often missing in data exports.
@@ -120,11 +126,17 @@ function processRequest(req) {
         if (element.data[0]) {
           qty = element.data[0].qty.toFixed(2) + " " + element.units + "s";
         }
+        // Miss a weigh in? Roast.
+        else {
+          qty = "Missed the weigh in.";
+        }
         write("Weight: " + qty + "\n");
         break;
     }
   });
+
   write("\n" + getInspiration());
+
   latest.write(latestMsg);
   latest.end();
   lastRequest.write(JSON.stringify(req.body.data));
@@ -167,18 +179,18 @@ function sendCheckInMessages() {
       var text = fs.readFileSync("updates/" + file, "utf8");
       var endOfFirstLine = text.indexOf("\n");
       var effect = text.substring(0, endOfFirstLine);
-      
+
       // Remove first line from text
       text = text.substring(endOfFirstLine + 1);
-      
+
       // Send message with file contents
       sendFABMessage(text, effect);
-      
+
       // If archive folder doesn't exist, create it
-      if (!fs.existsSync("archive")){
+      if (!fs.existsSync("archive")) {
         fs.mkdirSync("archive");
       }
-      
+
       // Move file once done
       fs.renameSync("updates/" + file, "archive/" + file);
     }
