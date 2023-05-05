@@ -223,8 +223,8 @@ function updateBB() {
 
   request(
     {
-      url: process.env.BB_UPDATESCHEDULEDMESSAGEURL,
-      method: "PUT",
+      url: process.env.BB_SCHEDULEMESSAGEURL,
+      method: "POST",
       json: {
         type: "send-message",
         payload: {
@@ -233,7 +233,7 @@ function updateBB() {
           method: "private-api",
         },
         scheduledFor: scheduleTime.getTime(),
-        schedule: { type: "recurring", interval: 1, intervalType: "daily" },
+        schedule: { type: "once" },
       },
     },
     (error, response, body) => {
