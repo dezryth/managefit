@@ -9,22 +9,22 @@ block content
       input#user.form-control(type='text', placeholder='Just your first name..' name='user' required='true' value=user )
       label(for='weight') Weight (If you feel like sharing):
       input#weight.form-control(type='text', placeholder='#, or "Down a pound today!" etc..' name='weight' value=weight )
-      label(for='activity') Activity (Make sure you're at least MOVING! 👟): 
+      label(for='activity') Activity (Make sure you're at least MOVING! 👟):
       input#activity.form-control(type='text', placeholder='Step Count, or "Went on a walk today" etc..' name='activity' value=activity )
       label(for='update') Update (Anything else you feel like sharing):
       input#update.form-control(type='text', placeholder='e.g. Wow Scott is handsome 😳..', name='update' value=update )
-      label(for='effect') Send with an Effect! (Default is no defect):
+      label(for='effect') Send with an Effect! (Default is no effect):
       br
       select#effect.select.form-control(name='effect')
         each value, key in effects
           option(value=value) #{key}
     button.btn.btn-primary(type='submit') Submit
     div.form-group.d-none
-      label(for='password') Password: 
+      label(for='password') Password:
       input#password.form-control(type='password', name='password' value=parameterPW )
-  
+
   br
-  if errors 
+  if errors
     h3.text-danger='Error:'
     ul
       for error in errors
