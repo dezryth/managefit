@@ -153,11 +153,11 @@ async function getAveragesThisWeek(db)
 
 }
 
-async function getAveragesLastMonth() {
+async function getAveragesLastMonth(db) {
   let sql = `SELECT AVG(weight_body_mass) AS AvgWeight, AVG(step_count) AS AvgStepCount, AVG(dietary_energy) AvgCalories,
   AVG(physical_effort) AvgPhysicalEffort FROM health_data WHERE date_for >= ?`;
 let today = new Date();
-let monthAgoTimeStamp = new Date(today.setMonth(today.getMonth - 1));
+let monthAgoTimeStamp = new Date(today.setMonth(today.getMonth() - 1));
 let monthAgo = new Date(monthAgoTimeStamp);
 monthAgo = monthAgo.toISOString().split("T")[0];
 

@@ -140,111 +140,112 @@ async function processRequest(req) {
   // Insert health data if not already present
   const newData = await database.insertHealthData(db, healthMetrics);
 
-  // Update Scheduled BB Message
-  var dateWithTimezone = date_for + "T00:00:00-06:00";
-  var message =
-    req.headers.user +
-    "'s " +
-    getDayOfWeekName(new Date(dateWithTimezone)) +
-    ":\n";
-  if (healthMetrics.step_count != null)
-    message += "Step Count: " + healthMetrics.step_count + "\n";
-  if (healthMetrics.body_mass_index != null)
-    message += "BMI: " + healthMetrics.body_mass_index + "\n";
-  if (healthMetrics.dietary_energy != null)
-    message +=
-      "Calories Consumed: " +
-      healthMetrics.dietary_energy +
-      (healthMetrics.dietary_energy < 1000
-        ? " (Likely incomplete log)\n"
-        : "\n");
-  if (healthMetrics.physical_effort != null)
-    message += "Physical Effort Level: " + healthMetrics.physical_effort + "\n";
-  if (healthMetrics.vo2_max != null)
-    message += "VO2 Max: " + healthMetrics.vo2_max + "\n";
-  if (healthMetrics.weight_body_mass != null)
-    message += "Weight: " + healthMetrics.weight_body_mass + " lbs\n";
-
-  // Append inspiration
-  message += getInspiration();
-  console.log(message);
-
   if (newData) {
-    updateBB(message);
-    await WeeklyUpdate();
-    await MonthlyUpdate();
+    DailyUpdate();
+    // If today is Saturday...
+    if (getDayOfWeekName(new Date()) == "Saturday") await WeeklyUpdate();
+    // If today is first of the month...
+    if (new Date().getDate() == 1) await MonthlyUpdate();
+  }
+
+  function DailyUpdate() {
+    var dateWithTimezone = date_for + "T00:00:00-06:00";
+    var message =
+      req.headers.user +
+      "'s " +
+      getDayOfWeekName(new Date(dateWithTimezone)) +
+      ":\n";
+    if (healthMetrics.step_count != null)
+      message += "Step Count: " + healthMetrics.step_count + "\n";
+    if (healthMetrics.body_mass_index != null)
+      message += "BMI: " + healthMetrics.body_mass_index + "\n";
+    if (healthMetrics.dietary_energy != null)
+      message +=
+        "Calories Consumed: " +
+        healthMetrics.dietary_energy +
+        (healthMetrics.dietary_energy < 1000
+          ? " (Likely incomplete log)\n"
+          : "\n");
+    if (healthMetrics.physical_effort != null)
+      message +=
+        "Physical Effort Level: " + healthMetrics.physical_effort + "\n";
+    if (healthMetrics.vo2_max != null)
+      message += "VO2 Max: " + healthMetrics.vo2_max + "\n";
+    if (healthMetrics.weight_body_mass != null)
+      message += "Weight: " + healthMetrics.weight_body_mass + " lbs\n";
+
+    // Append inspiration
+    message += getInspiration();
+    console.log(message);
   }
 
   async function WeeklyUpdate() {
-    if (getDayOfWeekName(new Date()) == "Saturday") {
-      var averages = await database.getAveragesThisWeek(db);
-      var message = req.headers.user + "'s Weekly Update\n";
-      if (averages.AvgWeight != null) {
-        var avgWeight = averages.AvgWeight.toFixed(2);
-        message += "Average Weight: " + avgWeight + " lbs\n";
-      }
-
-      if (averages.AvgStepCount != null) {
-        var avgStepCount = averages.AvgStepCount;
-        message += "Average Step Count: " + avgStepCount + "\n";
-      }
-
-      if (averages.AvgCalories != null) {
-        var avgCalories = averages.AvgCalories;
-        message += "Average Calories Consumed: " + avgCalories + "\n";
-      }
-
-      if (averages.AvgPhysicalEffort != null) {
-        var avgPhysicalEffort = averages.AvgPhysicalEffort;
-        message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
-      }
-
-      message += "Share a check in at " + process.env.CHECKIN_URL;
-
-      console.log(message);
-      updateBB(message);
+    var averages = await database.getAveragesThisWeek(db);
+    var message = req.headers.user + "'s Weekly Update\n";
+    if (averages.AvgWeight != null) {
+      var avgWeight = averages.AvgWeight.toFixed(2);
+      message += "Average Weight: " + avgWeight + " lbs\n";
     }
+
+    if (averages.AvgStepCount != null) {
+      var avgStepCount = averages.AvgStepCount;
+      message += "Average Step Count: " + avgStepCount + "\n";
+    }
+
+    if (averages.AvgCalories != null) {
+      var avgCalories = averages.AvgCalories;
+      message += "Average Calories Consumed: " + avgCalories + "\n";
+    }
+
+    if (averages.AvgPhysicalEffort != null) {
+      var avgPhysicalEffort = averages.AvgPhysicalEffort;
+      message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
+    }
+
+    message += "Share a check in at " + process.env.CHECKIN_URL;
+
+    console.log(message);
+    updateBB(message);
   }
 
   async function MonthlyUpdate() {
-    if (new Date().getDate == 1) {
-      var averages = await database.getAveragesLastMonth(db);
-      var message = req.headers.user + "'s Monthly Update\n";
-      if (averages.AvgWeight != null) {
-        var avgWeight = averages.AvgWeight.toFixed(2);
-        message += "Average Weight: " + avgWeight + " lbs\n";
+    var averages = await database.getAveragesLastMonth(db);
+    var message = req.headers.user + "'s Monthly Update\n";
+    if (averages.AvgWeight != null) {
+      var avgWeight = averages.AvgWeight.toFixed(2);
+      message += "Average Weight: " + avgWeight + " lbs\n";
 
-        if (process.env.START_WEIGHT && process.env.GOAL_WEIGHT) {
-          var progressPercent =
-            (process.env.START_WEIGHT - averages.AvgWeight) /
-            (process.env.START_WEIGHT - process.env.GOAL_WEIGHT);
-          message +=
-            "Total Progress Towards Goal Weight: " +
-            progressPercent.toFixed(2) +
-            "%\n";
-        }
+      if (process.env.START_WEIGHT && process.env.GOAL_WEIGHT) {
+        var progressPercent =
+          ((process.env.START_WEIGHT - averages.AvgWeight) /
+            (process.env.START_WEIGHT - process.env.GOAL_WEIGHT)) *
+          100;
+        message +=
+          "Total Progress Towards Goal Weight: " +
+          progressPercent.toFixed(2) +
+          "%\n";
       }
-
-      if (averages.AvgStepCount != null) {
-        var avgStepCount = averages.AvgStepCount;
-        message += "Average Step Count: " + avgStepCount + "\n";
-      }
-
-      if (averages.AvgCalories != null) {
-        var avgCalories = averages.AvgCalories;
-        message += "Average Calories Consumed: " + avgCalories + "\n";
-      }
-
-      if (averages.AvgPhysicalEffort != null) {
-        var avgPhysicalEffort = averages.AvgPhysicalEffort;
-        message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
-      }
-
-      message += "Share a check in at " + process.env.CHECKIN_URL;
-
-      console.log(message);
-      updateBB(message);
     }
+
+    if (averages.AvgStepCount != null) {
+      var avgStepCount = averages.AvgStepCount;
+      message += "Average Step Count: " + avgStepCount + "\n";
+    }
+
+    if (averages.AvgCalories != null) {
+      var avgCalories = averages.AvgCalories;
+      message += "Average Calories Consumed: " + avgCalories + "\n";
+    }
+
+    if (averages.AvgPhysicalEffort != null) {
+      var avgPhysicalEffort = averages.AvgPhysicalEffort;
+      message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
+    }
+
+    message += "Share a check in at " + process.env.CHECKIN_URL;
+
+    console.log(message);
+    updateBB(message);
   }
 }
 
