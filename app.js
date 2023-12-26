@@ -31,13 +31,13 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 
 // Route handling
-app.use("/", indexRouter);
 app.use("/checkin", checkinRouter);
 
 app.post("/data", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
-    res.json(["POST Request Received. " + JSON.stringify(req.body.data)]);
+    res.json(["POST Request Received. "]);
+    console.log(JSON.stringify(req.body.data));
     processRequest(req);
   } else {
     console.log("Invalid request body received.\n" + req.body);
@@ -171,13 +171,58 @@ async function processRequest(req) {
 
   if (newData) {
     updateBB(message);
+    await WeeklyUpdate();
+    await MonthlyUpdate();
+  }
 
+  async function WeeklyUpdate() {
     if (getDayOfWeekName(new Date()) == "Saturday") {
       var averages = await database.getAveragesThisWeek(db);
       message = req.headers.user + "'s Weekly Update\n";
       if (averages.AvgWeight != null) {
         var avgWeight = averages.AvgWeight.toFixed(2);
         message += "Average Weight: " + avgWeight + " lbs\n";
+      }
+
+      if (averages.AvgStepCount != null) {
+        var avgStepCount = averages.AvgStepCount;
+        message += "Average Step Count: " + avgStepCount + "\n";
+      }
+
+      if (averages.AvgCalories != null) {
+        var avgCalories = averages.AvgCalories;
+        message += "Average Calories Consumed: " + avgCalories + "\n";
+      }
+
+      if (averages.AvgPhysicalEffort != null) {
+        var avgPhysicalEffort = averages.AvgPhysicalEffort;
+        message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
+      }
+
+      message += "Share a check in at " + process.env.CHECKIN_URL;
+
+      console.log(message);
+      updateBB(message);
+    }
+  }
+
+  async function MonthlyUpdate() {
+    if (new Date().getDate == 1) {
+      var averages = await database.getAveragesLastMonth(db);
+      message = req.headers.user + "'s Monthly Update\n";
+      if (averages.AvgWeight != null) {
+        var avgWeight = averages.AvgWeight.toFixed(2);
+        message += "Average Weight: " + avgWeight + " lbs\n";
+
+        if (process.env.START_WEIGHT && process.env.GOAL_WEIGHT) {
+          var progressPercent =
+            (process.env.START_WEIGHT - averages.Weight) /
+            (process.env.START_WEIGHT - process.env.GOAL_WEIGHT);
+          message +=
+            "Total Progress Towards Goal Weight: " +
+            progressPercent.toFixed(2) +
+            "%\n";
+        }
       }
 
       if (averages.AvgStepCount != null) {

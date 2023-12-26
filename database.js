@@ -153,6 +153,34 @@ async function getAveragesThisWeek(db)
 
 }
 
+async function getAveragesLastMonth() {
+  let sql = `SELECT AVG(weight_body_mass) AS AvgWeight, AVG(step_count) AS AvgStepCount, AVG(dietary_energy) AvgCalories,
+  AVG(physical_effort) AvgPhysicalEffort FROM health_data WHERE date_for >= ?`;
+let today = new Date();
+let monthAgoTimeStamp = new Date(today.setMonth(today.getMonth - 1));
+let monthAgo = new Date(monthAgoTimeStamp);
+monthAgo = monthAgo.toISOString().split("T")[0];
+
+let averages = {
+  AvgWeight: null,
+  AvgStepCount: null,
+  AvgCalories: null,
+  AvgPhysicalEffort: null,
+}
+
+try {
+  const row = await db.prepare(sql).get(monthAgo);
+  averages.AvgWeight = row.AvgWeight;
+  averages.AvgStepCount = row.AvgStepCount;
+  averages.AvgCalories = row.AvgCalories;
+  averages.AvgPhysicalEffort = row.AvgPhysicalEffort;
+  return averages;
+} catch (error) {
+  console.error("Better SQLite3 Error:", error.message);
+  reject(error);
+}
+}
+
 module.exports = {
   getDatabase,
   createDatabase,
@@ -161,4 +189,5 @@ module.exports = {
   getHealthDataRow,
   insertHealthData,
   getAveragesThisWeek,
+  getAveragesLastMonth,
 };
