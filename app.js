@@ -216,7 +216,7 @@ async function processRequest(req) {
 
         if (process.env.START_WEIGHT && process.env.GOAL_WEIGHT) {
           var progressPercent =
-            (process.env.START_WEIGHT - averages.Weight) /
+            (process.env.START_WEIGHT - averages.AvgWeight) /
             (process.env.START_WEIGHT - process.env.GOAL_WEIGHT);
           message +=
             "Total Progress Towards Goal Weight: " +
