@@ -178,7 +178,7 @@ async function processRequest(req) {
   async function WeeklyUpdate() {
     if (getDayOfWeekName(new Date()) == "Saturday") {
       var averages = await database.getAveragesThisWeek(db);
-      message = req.headers.user + "'s Weekly Update\n";
+      var message = req.headers.user + "'s Weekly Update\n";
       if (averages.AvgWeight != null) {
         var avgWeight = averages.AvgWeight.toFixed(2);
         message += "Average Weight: " + avgWeight + " lbs\n";
@@ -209,7 +209,7 @@ async function processRequest(req) {
   async function MonthlyUpdate() {
     if (new Date().getDate == 1) {
       var averages = await database.getAveragesLastMonth(db);
-      message = req.headers.user + "'s Monthly Update\n";
+      var message = req.headers.user + "'s Monthly Update\n";
       if (averages.AvgWeight != null) {
         var avgWeight = averages.AvgWeight.toFixed(2);
         message += "Average Weight: " + avgWeight + " lbs\n";
