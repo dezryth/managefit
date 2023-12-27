@@ -177,6 +177,7 @@ async function processRequest(req) {
     // Append inspiration
     message += getInspiration();
     console.log(message);
+    updateBB(message);
   }
 
   async function WeeklyUpdate() {
