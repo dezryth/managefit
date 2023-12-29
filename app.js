@@ -141,7 +141,7 @@ async function processRequest(req) {
   // Insert health data if not already present
   const newData = await database.insertHealthData(db, healthMetrics);
 
-  if (newData || req.headers.override == true) {
+  if (newData || req.headers.override == "true") {
     DailyUpdate();
     // If today is Saturday...
     if (getDayOfWeekName(new Date()) == "Sunday") await WeeklyUpdate();
