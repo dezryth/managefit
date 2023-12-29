@@ -79,10 +79,9 @@ async function processRequest(req) {
   var physical_effort = null;
   var vo2_max = null;
   var weight_body_mass = null;
-  var date_for = null;
 
   req.body.data.metrics.forEach((element) => {
-    date_for = new Date(element.data[0].date).toISOString().split("T")[0];
+    date_for = new Date(element.data[0].date);
     switch (element.name) {
       case "body_mass_index":
         if (element.data[0]) {
@@ -117,8 +116,10 @@ async function processRequest(req) {
     }
   });
 
+  var date_for_formatted = date_for.toISOString().split("T")[0];
+
   const healthMetrics = {
-    date_for: date_for,
+    date_for: date_for_formatted,
     user: req.headers.user,
     step_count: step_count,
     body_mass_index: body_mass_index,
@@ -149,7 +150,7 @@ async function processRequest(req) {
   }
 
   function DailyUpdate() {
-    var dateWithTimezone = date_for + "T00:00:00-06:00";
+    var dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
     var message =
       req.headers.user +
       "'s " +
