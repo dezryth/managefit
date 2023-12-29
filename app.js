@@ -143,7 +143,7 @@ async function processRequest(req) {
   if (newData || req.headers.override) {
     DailyUpdate();
     // If today is Saturday...
-    if (getDayOfWeekName(new Date()) == "Saturday") await WeeklyUpdate();
+    if (getDayOfWeekName(new Date()) == "Sunday") await WeeklyUpdate();
     // If today is first of the month...
     if (new Date().getDate() == 1) await MonthlyUpdate();
   }
