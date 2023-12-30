@@ -155,13 +155,13 @@ async function processRequest(req) {
   // Insert health data if not already present
   const newData = await database.insertHealthData(db, healthMetrics);
 
-  // if (newData || req.headers.override == "true") {
-  //   DailyUpdate();
-  //   // If today is Saturday...
-  //   if (getDayOfWeekName(new Date()) == "Sunday") await WeeklyUpdate();
-  //   // If today is first of the month...
-  //   if (new Date().getDate() == 1) await MonthlyUpdate();
-  // }
+  if (newData || req.headers.override == "true") {
+    DailyUpdate();
+    // If today is Saturday...
+    if (getDayOfWeekName(new Date()) == "Sunday") await WeeklyUpdate();
+    // If today is first of the month...
+    if (new Date().getDate() == 1) await MonthlyUpdate();
+  }
 
   function DailyUpdate() {
     var dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
