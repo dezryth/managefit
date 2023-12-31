@@ -204,17 +204,17 @@ async function processRequest(req) {
     }
 
     if (averages.AvgStepCount != null) {
-      var avgStepCount = averages.AvgStepCount;
+      var avgStepCount = averages.AvgStepCount.toFixed(2);
       message += "Average Step Count: " + avgStepCount + "\n";
     }
 
     if (averages.AvgCalories != null) {
-      var avgCalories = averages.AvgCalories;
+      var avgCalories = averages.AvgCalories.toFixed(2);;
       message += "Average Calories Consumed: " + avgCalories + "\n";
     }
 
     if (averages.AvgPhysicalEffort != null) {
-      var avgPhysicalEffort = averages.AvgPhysicalEffort;
+      var avgPhysicalEffort = averages.AvgPhysicalEffort.toFixed(2);
       message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
     }
 
