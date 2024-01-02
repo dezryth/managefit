@@ -36,7 +36,7 @@ function createTables(newdb) {
         user text not null,
         step_count integer null,
         body_mass_index real null,
-        dietary_energy integer null,
+        dietary_energy integer default 2000 null,
         physical_effort real null,
         vo2_max real null,
         weight_body_mass real null);`
