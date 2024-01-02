@@ -368,7 +368,6 @@ function updateBB(message) {
       json: {
         chatGuid: process.env.BB_CHATGUID,
         message: message,
-        method: "private-api",
       },
     },
     (error, response, body) => {
