@@ -218,7 +218,7 @@ async function processRequest(req) {
       message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
     }
 
-    message += "Share a check in at " + process.env.CHECKIN_URL;
+    message += "Share a check in at:" + process.env.CHECKIN_URL;
 
     console.log(message);
     updateBB(message);
@@ -258,7 +258,7 @@ async function processRequest(req) {
       message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
     }
 
-    message += "Share a check in at " + process.env.CHECKIN_URL;
+    message += "Share a check in at:" + process.env.CHECKIN_URL;
 
     console.log(message);
     updateBB(message);
