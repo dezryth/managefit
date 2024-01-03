@@ -172,8 +172,6 @@ async function processRequest(req) {
       ":\n";
     if (healthMetrics.step_count != null)
       message += "Step Count: " + healthMetrics.step_count + "\n";
-    if (healthMetrics.body_mass_index != null)
-      message += "BMI: " + healthMetrics.body_mass_index + "\n";
     if (healthMetrics.dietary_energy != null)
       message +=
         "Calories Consumed: " +
@@ -184,10 +182,12 @@ async function processRequest(req) {
     if (healthMetrics.physical_effort != null)
       message +=
         "Physical Effort Level: " + healthMetrics.physical_effort + "\n";
-    if (healthMetrics.vo2_max != null)
-      message += "VO2 Max: " + healthMetrics.vo2_max + "\n";
-    if (healthMetrics.weight_body_mass != null)
-      message += "Weight: " + healthMetrics.weight_body_mass + " lbs\n";
+    // if (healthMetrics.vo2_max != null)
+    //   message += "VO2 Max: " + healthMetrics.vo2_max + "\n";
+    // if (healthMetrics.body_mass_index != null)
+    //   message += "BMI: " + healthMetrics.body_mass_index + "\n";
+    // if (healthMetrics.weight_body_mass != null)
+    //   message += "Weight: " + healthMetrics.weight_body_mass + " lbs\n";
 
     // Append inspiration
     message += getInspiration();
