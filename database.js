@@ -125,7 +125,7 @@ function updateHealthData(db, rowId, healthMetrics)
 
 async function getAveragesThisWeek(db)
 {
-  let sql = `SELECT AVG(weight_body_mass) AS AvgWeight, AVG(step_count) AS AvgStepCount, AVG(dietary_energy) AvgCalories,
+  let sql = `SELECT AVG(weight_body_mass) AS AvgWeight, AVG(step_count) AS AvgStepCount, AVG(CASE WHEN dietary_energy IS NULL THEN 2200 WHEN dietary_energy < 1000 THEN 2000 END) AvgCalories,
     AVG(physical_effort) AvgPhysicalEffort FROM health_data WHERE date_for >= ?`;
   let today = new Date();
   let sevenDaysAgoTimeStamp = new Date(today.getTime()- 7 * 24 * 60 * 60 * 1000);
@@ -154,7 +154,7 @@ async function getAveragesThisWeek(db)
 }
 
 async function getAveragesLastMonth(db) {
-  let sql = `SELECT AVG(weight_body_mass) AS AvgWeight, AVG(step_count) AS AvgStepCount, AVG(dietary_energy) AvgCalories,
+  let sql = `SELECT AVG(weight_body_mass) AS AvgWeight, AVG(step_count) AS AvgStepCount, AVG(CASE WHEN dietary_energy IS NULL THEN 2200 WHEN dietary_energy < 1000 THEN 2000 END) AvgCalories,
   AVG(physical_effort) AvgPhysicalEffort FROM health_data WHERE date_for >= ?`;
 let today = new Date();
 let monthAgoTimeStamp = new Date(today.setMonth(today.getMonth() - 1));
