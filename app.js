@@ -12,7 +12,7 @@ var db = database.getDatabase();
 var quotes;
 
 const indexRouter = require("./routes/index");
-const checkinRouter = require("./routes/checkin");
+//const checkinRouter = require("./routes/checkin");
 
 const app = express();
 
@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 
 // Route handling
-app.use("/checkin", checkinRouter);
+//app.use("/checkin", checkinRouter);
 
 app.post("/data", (req, res) => {
   // Extract data from request body and store in database
@@ -243,7 +243,7 @@ async function processRequest(req) {
     //   message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
     // }
 
-    message += "Share a check in at:" + process.env.CHECKIN_URL;
+    // message += "Share a check in at:" + process.env.CHECKIN_URL;
 
     console.log(message);
     updateBB(message);
@@ -272,7 +272,7 @@ async function processRequest(req) {
     //   message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
     // }
 
-    message += "Share a check in at:" + process.env.CHECKIN_URL;
+    // message += "Share a check in at:" + process.env.CHECKIN_URL;
 
     console.log(message);
     updateBB(message);
