@@ -179,9 +179,9 @@ async function processRequest(req) {
         (healthMetrics.dietary_energy < 1000
           ? " (Likely incomplete log)\n"
           : "\n");
-    if (healthMetrics.physical_effort != null)
-      message +=
-        "Physical Effort Level: " + healthMetrics.physical_effort + "\n";
+    // if (healthMetrics.physical_effort != null)
+    //   message +=
+    //     "Physical Effort Level: " + healthMetrics.physical_effort + "\n";
     // if (healthMetrics.vo2_max != null)
     //   message += "VO2 Max: " + healthMetrics.vo2_max + "\n";
     // if (healthMetrics.body_mass_index != null)
@@ -213,10 +213,35 @@ async function processRequest(req) {
       message += "Average Calories Consumed: " + avgCalories + "\n";
     }
 
-    if (averages.AvgPhysicalEffort != null) {
-      var avgPhysicalEffort = averages.AvgPhysicalEffort.toFixed(2);
-      message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
+    // Goal check
+    if (process.env.GOAL_STARTDATE && process.env.START_WEIGHT && process.env.GOAL_WEIGHT) {
+      var progressPercent =
+        ((process.env.START_WEIGHT - averages.AvgWeight) /
+          (process.env.START_WEIGHT - process.env.GOAL_WEIGHT)) *
+        100;
+
+        message += "Current Goal: Get from " + process.env.START_WEIGHT + " to " + process.env.GOAL_WEIGHT + " lbs\n";
+        message +=
+          "Total Progress Towards Goal Weight: " +
+          progressPercent.toFixed(2) +
+          "%\n";
+
+      if (progressPercent >= 100)
+      {
+        var today = new Date();
+        var goalStartDate = new Date(process.env.GOAL_STARTDATE);
+        var timeDifference = goalStartDate.getTime() - today.getTime();
+        var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+        message += "Goal has been met! Reached in " + daysDifference + " days!\nTime for a new goal!\n";
+
+        process.env.GOAL_STARTDATE = null;
+      }
     }
+
+    // if (averages.AvgPhysicalEffort != null) {
+    //   var avgPhysicalEffort = averages.AvgPhysicalEffort.toFixed(2);
+    //   message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
+    // }
 
     message += "Share a check in at:" + process.env.CHECKIN_URL;
 
@@ -230,17 +255,6 @@ async function processRequest(req) {
     if (averages.AvgWeight != null) {
       var avgWeight = averages.AvgWeight.toFixed(2);
       message += "Average Weight: " + avgWeight + " lbs\n";
-
-      if (process.env.START_WEIGHT && process.env.GOAL_WEIGHT) {
-        var progressPercent =
-          ((process.env.START_WEIGHT - averages.AvgWeight) /
-            (process.env.START_WEIGHT - process.env.GOAL_WEIGHT)) *
-          100;
-        message +=
-          "Total Progress Towards Goal Weight: " +
-          progressPercent.toFixed(2) +
-          "%\n";
-      }
     }
 
     if (averages.AvgStepCount != null) {
@@ -253,10 +267,10 @@ async function processRequest(req) {
       message += "Average Calories Consumed: " + avgCalories + "\n";
     }
 
-    if (averages.AvgPhysicalEffort != null) {
-      var avgPhysicalEffort = averages.AvgPhysicalEffort.toFixed(2);;
-      message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
-    }
+    // if (averages.AvgPhysicalEffort != null) {
+    //   var avgPhysicalEffort = averages.AvgPhysicalEffort.toFixed(2);;
+    //   message += "Average Physical Effort: " + avgPhysicalEffort + "\n";
+    // }
 
     message += "Share a check in at:" + process.env.CHECKIN_URL;
 
