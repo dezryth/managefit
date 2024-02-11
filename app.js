@@ -232,7 +232,7 @@ async function processRequest(req) {
         var goalStartDate = new Date(process.env.GOAL_STARTDATE);
         var timeDifference = goalStartDate.getTime() - today.getTime();
         var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
-        message += "Goal has been met! Reached in " + daysDifference + " days!\nTime for a new goal!\n";
+        message += "Goal has been met! Reached in " + daysDifference + " days!\nTime for a new goal!";
 
         process.env.GOAL_STARTDATE = null;
       }
