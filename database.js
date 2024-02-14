@@ -218,6 +218,7 @@ async function getCurrentGoal(db)
     goal.StartDate = row.start_date;
     goal.StartWeight = row.start_weight;
     goal.GoalWeight = row.goalWeight;
+    console.log(goal.GoalWeight, goal.StartWeight, goal.StartDate);
     return goal;
   } catch (error) {
     console.error("Better SQLite3 Error:", error.message);
