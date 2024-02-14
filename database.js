@@ -214,7 +214,7 @@ async function getCurrentGoal(db)
   }
 
   try {
-    const row = await db.prepare(sql).get(sevenDaysAgo);
+    const row = await db.prepare(sql).get();
     goal.StartDate = row.start_date;
     goal.StartWeight = row.start_weight;
     goal.GoalWeight = row.goalWeight;
