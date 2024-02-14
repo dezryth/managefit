@@ -206,7 +206,7 @@ async function getAveragesLastMonth(db) {
 
 async function getCurrentGoal(db)
 {
-  let sql = `SELECT start_weight, goal_weight FROM goals WHERE completed_date IS NULL ORDER BY id ASC LIMIT 1`;
+  let sql = `SELECT start_date, start_weight, goal_weight FROM goals WHERE completed_date IS NULL ORDER BY id ASC LIMIT 1`;
   let goal = {
     StartDate: null,
     StartWeight: null,
@@ -217,7 +217,7 @@ async function getCurrentGoal(db)
     const row = await db.prepare(sql).get();
     goal.StartDate = row.start_date;
     goal.StartWeight = row.start_weight;
-    goal.GoalWeight = row.goalWeight;
+    goal.GoalWeight = row.goal_weight;
     console.log(goal.GoalWeight, goal.StartWeight, goal.StartDate);
     return goal;
   } catch (error) {
