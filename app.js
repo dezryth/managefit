@@ -163,7 +163,8 @@ async function processRequest(req) {
     if (new Date().getDate() == 1) await MonthlyUpdate();
   }
 
-  function DailyUpdate() {
+  async function DailyUpdate() {
+    let goal = await database.getCurrentGoal(db);
     var dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
     var message =
       req.headers.user +
@@ -189,10 +190,33 @@ async function processRequest(req) {
     // if (healthMetrics.weight_body_mass != null)
     //   message += "Weight: " + healthMetrics.weight_body_mass + " lbs\n";
 
+    // Goal Check
+    if (goal.StartDate && goal.StartWeight && goal.GoalWeight) {
+      var progressPercent = ((goal.StartWeight - healthMetrics.weight_body_mass) /
+        (goal.StartWeight - goal.GoalWeight)) *
+        100;
+
+      message += "Current Goal: Get from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
+      message +=
+        "Total Progress Towards Goal Weight: " +
+        progressPercent.toFixed(2) +
+        "%\n";
+
+      if (progressPercent >= 100) {
+        var today = new Date();
+        var goalStartDate = new Date(goal.StartDate);
+        var timeDifference = goalStartDate.getTime() - today.getTime();
+        var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+        message += "Goal has been met! Reached in " + daysDifference + " days!\nTime for the next goal!";
+
+        database.completeGoal(db, healthMetrics.date_for);
+      }
+    }
+
     // Append inspiration
     message += getInspiration();
     console.log(message);
-    updateBB(message);
+    //updateBB(message);
   }
 
   async function WeeklyUpdate() {
@@ -211,31 +235,6 @@ async function processRequest(req) {
     if (averages.AvgCalories != null) {
       var avgCalories = averages.AvgCalories.toFixed(2);;
       message += "Average Calories Consumed: " + avgCalories + "\n";
-    }
-
-    // Goal check
-    if (process.env.GOAL_STARTDATE && process.env.START_WEIGHT && process.env.GOAL_WEIGHT) {
-      var progressPercent =
-        ((process.env.START_WEIGHT - averages.AvgWeight) /
-          (process.env.START_WEIGHT - process.env.GOAL_WEIGHT)) *
-        100;
-
-        message += "Current Goal: Get from " + process.env.START_WEIGHT + " to " + process.env.GOAL_WEIGHT + " lbs\n";
-        message +=
-          "Total Progress Towards Goal Weight: " +
-          progressPercent.toFixed(2) +
-          "%\n";
-
-      if (progressPercent >= 100)
-      {
-        var today = new Date();
-        var goalStartDate = new Date(process.env.GOAL_STARTDATE);
-        var timeDifference = goalStartDate.getTime() - today.getTime();
-        var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
-        message += "Goal has been met! Reached in " + daysDifference + " days!\nTime for a new goal!\n";
-
-        process.env.GOAL_STARTDATE = null;
-      }
     }
 
     // if (averages.AvgPhysicalEffort != null) {

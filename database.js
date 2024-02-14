@@ -41,6 +41,30 @@ function createTables(newdb) {
         vo2_max real null,
         weight_body_mass real null);`
     );
+
+    // newdb.exec(
+    //   `create table exercise (
+    //     id integer primary key autoincrement,
+    //     date_for datetime unique not null,
+    //     user text not null,
+    //     step_count integer null,
+    //     body_mass_index real null,
+    //     dietary_energy integer default 2000 null,
+    //     physical_effort real null,
+    //     vo2_max real null,
+    //     weight_body_mass real null);`
+    // );
+
+    newdb.exec(
+      `create table goals (
+        id integer primary key autoincrement,
+        created_date datetime not null,
+        start_date datetime null,
+        user text not null,
+        start_weight real null,
+        goal_weight real null,
+        completed_date datetime null);`
+    );
   } catch (error) {
     console.error("Better SQLite3 Error:", error.message);
   }
@@ -150,35 +174,71 @@ async function getAveragesThisWeek(db)
     console.error("Better SQLite3 Error:", error.message);
     reject(error);
   }
-
 }
 
 async function getAveragesLastMonth(db) {
   let sql = `SELECT AVG(weight_body_mass) AS AvgWeight, AVG(step_count) AS AvgStepCount, AVG(CASE WHEN dietary_energy IS NULL THEN 2200 WHEN dietary_energy < 1000 THEN 2000 END) AvgCalories,
   AVG(physical_effort) AvgPhysicalEffort FROM health_data WHERE date_for >= ?`;
-let today = new Date();
-let monthAgoTimeStamp = new Date(today.setMonth(today.getMonth() - 1));
-let monthAgo = new Date(monthAgoTimeStamp);
-monthAgo = monthAgo.toISOString().split("T")[0];
+  let today = new Date();
+  let monthAgoTimeStamp = new Date(today.setMonth(today.getMonth() - 1));
+  let monthAgo = new Date(monthAgoTimeStamp);
+  monthAgo = monthAgo.toISOString().split("T")[0];
 
-let averages = {
-  AvgWeight: null,
-  AvgStepCount: null,
-  AvgCalories: null,
-  AvgPhysicalEffort: null,
+  let averages = {
+    AvgWeight: null,
+    AvgStepCount: null,
+    AvgCalories: null,
+    AvgPhysicalEffort: null,
+  }
+
+  try {
+    const row = await db.prepare(sql).get(monthAgo);
+    averages.AvgWeight = row.AvgWeight;
+    averages.AvgStepCount = row.AvgStepCount;
+    averages.AvgCalories = row.AvgCalories;
+    averages.AvgPhysicalEffort = row.AvgPhysicalEffort;
+    return averages;
+  } catch (error) {
+    console.error("Better SQLite3 Error:", error.message);
+    reject(error);
+  }
 }
 
-try {
-  const row = await db.prepare(sql).get(monthAgo);
-  averages.AvgWeight = row.AvgWeight;
-  averages.AvgStepCount = row.AvgStepCount;
-  averages.AvgCalories = row.AvgCalories;
-  averages.AvgPhysicalEffort = row.AvgPhysicalEffort;
-  return averages;
-} catch (error) {
-  console.error("Better SQLite3 Error:", error.message);
-  reject(error);
+async function getCurrentGoal(db)
+{
+  let sql = `SELECT start_weight, goal_weight FROM goals WHERE completed_date IS NULL ORDER BY id ASC LIMIT 1`;
+  let goal = {
+    StartDate: null,
+    StartWeight: null,
+    GoalWeight: null,
+  }
+
+  try {
+    const row = await db.prepare(sql).get(sevenDaysAgo);
+    goal.StartDate = row.start_date;
+    goal.StartWeight = row.start_weight;
+    goal.GoalWeight = row.goalWeight;
+    return goal;
+  } catch (error) {
+    console.error("Better SQLite3 Error:", error.message);
+    reject(error);
+  }
 }
+
+function completeGoal(db, completeDate)
+{
+  var completeGoalCmd = `
+    UPDATE goals
+    SET
+      completeDate = ?
+    WHERE
+    completed_date IS NULL ORDER BY id ASC LIMIT 1;`;
+
+  try {
+    const exec = db.prepare(completeGoalCmd).run(completeDate);
+  } catch (error) {
+    console.error("Better SQLite3 Error:", error.message);
+  }
 }
 
 module.exports = {
@@ -190,4 +250,6 @@ module.exports = {
   insertHealthData,
   getAveragesThisWeek,
   getAveragesLastMonth,
+  getCurrentGoal,
+  completeGoal
 };
