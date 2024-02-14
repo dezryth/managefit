@@ -198,7 +198,7 @@ async function processRequest(req) {
 
       message += "Current Goal: Get from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
       message +=
-        "Total Progress Towards Goal Weight: " +
+        "Progress towards goal: " +
         progressPercent.toFixed(2) +
         "%\n";
 
@@ -207,7 +207,7 @@ async function processRequest(req) {
         var goalStartDate = new Date(goal.StartDate);
         var timeDifference = goalStartDate.getTime() - today.getTime();
         var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
-        message += "Goal has been met! Reached in " + daysDifference + " days!\nTime for the next goal!";
+        message += "Goal has been met! Reached in " + daysDifference + " days!\nStarting next goal.";
 
         database.completeGoal(db, healthMetrics.date_for);
       }
@@ -216,7 +216,7 @@ async function processRequest(req) {
     // Append inspiration
     message += getInspiration();
     console.log(message);
-    //updateBB(message);
+    updateBB(message);
   }
 
   async function WeeklyUpdate() {
