@@ -11,7 +11,7 @@ const database = require("./database");
 var db = database.getDatabase();
 var quotes;
 
-const indexRouter = require("./routes/index");
+//const indexRouter = require("./routes/index");
 //const checkinRouter = require("./routes/checkin");
 
 const app = express();
@@ -33,10 +33,22 @@ app.use(express.urlencoded({ extended: false }));
 // Route handling
 //app.use("/checkin", checkinRouter);
 
+app.post("/workouts", (req, res) => {
+  // Extract data from request body and store in database
+  if (req.body.data) {
+    res.json(["POST workouts Request Received. "]);
+    console.log(JSON.stringify(req.body.data));
+    //processRequest(req);
+  } else {
+    console.log("Invalid request body received.\n" + req.body);
+    res.json("Invalid request body.");
+  }
+});
+
 app.post("/data", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
-    res.json(["POST Request Received. "]);
+    res.json(["POST healthdata Request Received. "]);
     console.log(JSON.stringify(req.body.data));
     processRequest(req);
   } else {
