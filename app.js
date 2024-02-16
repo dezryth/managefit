@@ -38,7 +38,7 @@ app.post("/workouts", (req, res) => {
   if (req.body.data) {
     res.json(["POST workouts Request Received. "]);
     console.log(JSON.stringify(req.body.data));
-    //processRequest(req);
+    processWorkouts(req);
   } else {
     console.log("Invalid request body received.\n" + req.body);
     res.json("Invalid request body.");
@@ -50,26 +50,26 @@ app.post("/data", (req, res) => {
   if (req.body.data) {
     res.json(["POST healthdata Request Received. "]);
     console.log(JSON.stringify(req.body.data));
-    processRequest(req);
+    processHealthData(req);
   } else {
     console.log("Invalid request body received.\n" + req.body);
     res.json("Invalid request body.");
   }
 });
 
-app.post("/admin/sendmessages", (req, res) => {
-  if (req.query.password == process.env.FAB_PASS) {
-    sendCheckInMessages();
-    res.sendStatus(200);
-  } else {
-    res.sendStatus(401);
-    console.log("Unauthorized attempt to access admin/sendmessages endpoint.");
-  }
-});
+// app.post("/admin/sendmessages", (req, res) => {
+//   if (req.query.password == process.env.FAB_PASS) {
+//     sendCheckInMessages();
+//     res.sendStatus(200);
+//   } else {
+//     res.sendStatus(401);
+//     console.log("Unauthorized attempt to access admin/sendmessages endpoint.");
+//   }
+// });
 
 app.listen(3000, () => {
   initialize();
-  console.log("Server running on port 3000");
+  console.log("ManageFit Server running on port 3000");
 });
 
 function initialize() {
@@ -83,7 +83,20 @@ function initialize() {
   });
 }
 
-async function processRequest(req) {
+async function processWorkouts(req) {
+  // Currently expecting data for yesterday due to inconsistent syncs for "today"
+  var workouts = []
+
+  req.body.workouts.forEach((element) => {
+    date_for = new Date(element.data[0].start);
+    workouts.push({Name: element.data[0].name, CaloriesBurned: element.data[0].activeEnergy.toFixed(0)})
+  })
+
+  console.log(workouts);
+
+}
+
+async function processHealthData(req) {
   // Currently expecting data for yesterday due to inconsistent syncs for "today"
   var step_count = null;
   var body_mass_index = null;
