@@ -208,7 +208,7 @@ async function processRequest(req) {
         (goal.StartWeight - goal.GoalWeight)) *
         100;
 
-      message += "Goal:\n Drop from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
+      message += "Goal:\nDrop from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
       message +=
         "Progress: " +
         progressPercent.toFixed(2) +
