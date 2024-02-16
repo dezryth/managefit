@@ -87,7 +87,7 @@ async function processWorkouts(req) {
   // Currently expecting data for yesterday due to inconsistent syncs for "today"
   var workouts = []
 
-  req.body.workouts.forEach((element) => {
+  req.body.data.workouts.forEach((element) => {
     date_for = new Date(element.data[0].start);
     workouts.push({Name: element.data[0].name, CaloriesBurned: element.data[0].activeEnergy.toFixed(0)})
   })
