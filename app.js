@@ -322,7 +322,7 @@ async function processHealthData(req) {
 
 function getInspiration() {
   var position = randomInteger(0, 1642); // There are 1643 inspirational quotes in our quotes file.
-  var quote = "'" + quotes[position].text + "'";
+  var quote = "\n'" + quotes[position].text + "'";
   // Some quotes don't have an author, so don't specify one if null
   if (quotes[position].author) {
     quote += " - " + quotes[position].author;
