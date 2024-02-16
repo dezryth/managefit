@@ -184,10 +184,10 @@ async function processRequest(req) {
       getDayOfWeekName(new Date(dateWithTimezone)) +
       ":\n";
     if (healthMetrics.step_count != null)
-      message += "Step Count: " + healthMetrics.step_count + "\n";
+      message += "Steps: " + healthMetrics.step_count + "\n";
     if (healthMetrics.dietary_energy != null)
       message +=
-        "Calories Consumed: " +
+        "Calories: " +
         healthMetrics.dietary_energy +
         (healthMetrics.dietary_energy < 1000
           ? " (Likely incomplete log)\n"
@@ -208,9 +208,9 @@ async function processRequest(req) {
         (goal.StartWeight - goal.GoalWeight)) *
         100;
 
-      message += "Current Goal: Get from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
+      message += "Goal:\n Drop from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
       message +=
-        "Progress towards goal: " +
+        "Progress: " +
         progressPercent.toFixed(2) +
         "%\n";
 
@@ -241,12 +241,12 @@ async function processRequest(req) {
 
     if (averages.AvgStepCount != null) {
       var avgStepCount = averages.AvgStepCount.toFixed(2);
-      message += "Average Step Count: " + avgStepCount + "\n";
+      message += "Average Steps: " + avgStepCount + "\n";
     }
 
     if (averages.AvgCalories != null) {
       var avgCalories = averages.AvgCalories.toFixed(2);;
-      message += "Average Calories Consumed: " + avgCalories + "\n";
+      message += "Average Calories: " + avgCalories + "\n";
     }
 
     // if (averages.AvgPhysicalEffort != null) {
@@ -270,12 +270,12 @@ async function processRequest(req) {
 
     if (averages.AvgStepCount != null) {
       var avgStepCount = averages.AvgStepCount.toFixed(2);;
-      message += "Average Step Count: " + avgStepCount + "\n";
+      message += "Average Steps: " + avgStepCount + "\n";
     }
 
     if (averages.AvgCalories != null) {
       var avgCalories = averages.AvgCalories.toFixed(2);;
-      message += "Average Calories Consumed: " + avgCalories + "\n";
+      message += "Average Calories: " + avgCalories + "\n";
     }
 
     // if (averages.AvgPhysicalEffort != null) {
