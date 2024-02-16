@@ -345,64 +345,64 @@ function getDayOfWeekName(date) {
   return dayOfWeekName;
 }
 
-function sendCheckInMessages() {
-  var files = fs.readdirSync("updates/");
+// function sendCheckInMessages() {
+//   var files = fs.readdirSync("updates/");
 
-  if (files.length > 0) {
-    for (const file of files) {
-      // Read file contents - store effect from first line
-      var text = fs.readFileSync("updates/" + file, "utf8");
-      var endOfFirstLine = text.indexOf("\n");
-      var effect = text.substring(0, endOfFirstLine);
+//   if (files.length > 0) {
+//     for (const file of files) {
+//       // Read file contents - store effect from first line
+//       var text = fs.readFileSync("updates/" + file, "utf8");
+//       var endOfFirstLine = text.indexOf("\n");
+//       var effect = text.substring(0, endOfFirstLine);
 
-      // Remove first line from text
-      text = text.substring(endOfFirstLine + 1);
+//       // Remove first line from text
+//       text = text.substring(endOfFirstLine + 1);
 
-      // Send message with file contents
-      sendFABMessage(text, effect);
+//       // Send message with file contents
+//       sendFABMessage(text, effect);
 
-      // If archive folder doesn't exist, create it
-      if (!fs.existsSync("archive")) {
-        fs.mkdirSync("archive");
-      }
+//       // If archive folder doesn't exist, create it
+//       if (!fs.existsSync("archive")) {
+//         fs.mkdirSync("archive");
+//       }
 
-      // Move file once done
-      fs.renameSync("updates/" + file, "archive/" + file);
-    }
-  }
-}
+//       // Move file once done
+//       fs.renameSync("updates/" + file, "archive/" + file);
+//     }
+//   }
+// }
 
-function sendFABMessage(text, effect) {
-  const headers = {
-    "Content-Type": "application/json",
-  };
+// function sendFABMessage(text, effect) {
+//   const headers = {
+//     "Content-Type": "application/json",
+//   };
 
-  const requestBody = {
-    chatGuid: process.env.BB_CHATGUID,
-    message: text,
-    method: "private-api",
-    effectId: effect,
-  };
+//   const requestBody = {
+//     chatGuid: process.env.BB_CHATGUID,
+//     message: text,
+//     method: "private-api",
+//     effectId: effect,
+//   };
 
-  const request = new Request(process.env.BB_SENDMESSAGEURL, {
-    method: "POST",
-    headers: new Headers(headers),
-    body: JSON.stringify(requestBody),
-  });
+//   const request = new Request(process.env.BB_SENDMESSAGEURL, {
+//     method: "POST",
+//     headers: new Headers(headers),
+//     body: JSON.stringify(requestBody),
+//   });
 
-  console.log(JSON.stringify(requestBody));
+//   console.log(JSON.stringify(requestBody));
 
-  fetch(request)
-    .then((response) => response.json())
-    .then((data) => {
-      // Handle the response data
-      console.log("Response:", data);
-    })
-    .catch((error) => {
-      // Handle errors
-      console.error("Error:", error);
-    });
-}
+//   fetch(request)
+//     .then((response) => response.json())
+//     .then((data) => {
+//       // Handle the response data
+//       console.log("Response:", data);
+//     })
+//     .catch((error) => {
+//       // Handle errors
+//       console.error("Error:", error);
+//     });
+// }
 
 function updateBB(message) {
   var afterHours = new Date();
