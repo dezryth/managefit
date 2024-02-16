@@ -35,12 +35,12 @@ app.use(express.urlencoded({ extended: false }));
 
 app.post("/workouts", (req, res) => {
   // Extract data from request body and store in database
-  if (req.body.data) {
+  if (req.body.workouts) {
     res.json(["POST workouts Request Received. "]);
-    console.log(JSON.stringify(req.body.data));
+    //console.log(JSON.stringify(req.body.workouts));
     processWorkouts(req);
   } else {
-    console.log("Invalid request body received.\n" + req.body);
+    console.log("Invalid request body received.\n" + JSON.stringify(req.body));
     res.json("Invalid request body.");
   }
 });
@@ -49,10 +49,10 @@ app.post("/data", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
     res.json(["POST healthdata Request Received. "]);
-    console.log(JSON.stringify(req.body.data));
+    //console.log(JSON.stringify(req.body.data));
     processHealthData(req);
   } else {
-    console.log("Invalid request body received.\n" + req.body);
+    console.log("Invalid request body received.\n" + JSON.stringify(req.body));
     res.json("Invalid request body.");
   }
 });
@@ -87,12 +87,24 @@ async function processWorkouts(req) {
   // Currently expecting data for yesterday due to inconsistent syncs for "today"
   var workouts = []
 
-  req.body.data.workouts.forEach((element) => {
-    date_for = new Date(element.data[0].start);
-    workouts.push({Name: element.data[0].name, CaloriesBurned: element.data[0].activeEnergy.toFixed(0)})
+  req.body.workouts.forEach((element) => {
+    date_for = new Date(element.start);
+    workouts.push({Name: element.name, CaloriesBurned: element.activeEnergy.qty.toFixed(0)})
   })
 
-  console.log(workouts);
+  //console.log(workouts);
+
+  if (workouts.length > 0)
+  {
+    let message = "Yesterday's Workouts:\n";
+
+    workouts.forEach((workout) => {
+      message += workout.Name + ": " + workout.CaloriesBurned + " cals\n"
+    });
+
+    console.log(message);
+    updateBB(message);
+  }
 
 }
 
