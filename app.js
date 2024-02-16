@@ -96,14 +96,19 @@ async function processWorkouts(req) {
 
   if (workouts.length > 0)
   {
-    let message = "Yesterday's Workouts:\n";
+    let date_for_formatted = date_for.toISOString().split("T")[0];
+    let dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
+    let message =
+      req.headers.user +
+      "'s " +
+      getDayOfWeekName(new Date(dateWithTimezone)) + " Workouts:\n";
 
     workouts.forEach((workout) => {
       message += workout.Name + ": " + workout.CaloriesBurned + " cals\n"
     });
 
     console.log(message);
-    updateBB(message);
+    //updateBB(message);
   }
 
 }
