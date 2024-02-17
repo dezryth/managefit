@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Route handling
 //app.use("/checkin", checkinRouter);
-
+console.log(JSON.stringify(req.body));
 app.post("/workouts", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.workouts) {
