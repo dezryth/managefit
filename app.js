@@ -33,9 +33,8 @@ app.use(express.urlencoded({ extended: false }));
 // Route handling
 //app.use("/checkin", checkinRouter);
 app.post("/workouts", (req, res) => {
-  console.log(JSON.stringify(req.body));
   // Extract data from request body and store in database
-  if (req.body.workouts) {
+  if (req.body.data) {
     res.json(["POST workouts Request Received. "]);
     //console.log(JSON.stringify(req.body.workouts));
     processWorkouts(req);
@@ -87,7 +86,7 @@ async function processWorkouts(req) {
   // Currently expecting data for yesterday due to inconsistent syncs for "today"
   var workouts = []
 
-  req.body.workouts.forEach((element) => {
+  req.body.data.workouts.forEach((element) => {
     date_for = new Date(element.start);
     workouts.push({Name: element.name, CaloriesBurned: element.activeEnergy.qty.toFixed(0)})
   })
