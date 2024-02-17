@@ -107,7 +107,7 @@ async function processWorkouts(req) {
     });
 
     console.log(message);
-    //updateBB(message);
+    updateBB(message);
   }
 
 }
