@@ -100,10 +100,10 @@ async function processWorkouts(req) {
     let message =
       req.headers.user +
       "'s " +
-      getDayOfWeekName(new Date(dateWithTimezone)) + " Workouts:\n";
+      getDayOfWeekName(new Date(dateWithTimezone)) + " Workouts:";
 
     workouts.forEach((workout) => {
-      message += workout.Name + ": " + workout.CaloriesBurned + " cals\n"
+      message += "\n" + workout.Name + ": " + workout.CaloriesBurned + " cals";
     });
 
     console.log(message);
