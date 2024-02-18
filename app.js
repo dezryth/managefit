@@ -275,7 +275,7 @@ async function processHealthData(req) {
 
     if (averages.AvgCalories != null) {
       var avgCalories = averages.AvgCalories.toFixed(2);;
-      message += "Average Calories: " + avgCalories + "\n";
+      message += "Average Calories: " + avgCalories;
     }
 
     // if (averages.AvgPhysicalEffort != null) {
