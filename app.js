@@ -237,7 +237,7 @@ async function processHealthData(req) {
         (goal.StartWeight - goal.GoalWeight)) *
         100;
 
-      message += "Goal:\nDrop from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
+      message += "Goal: Drop from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
       message +=
         "Status: " +
         progressPercent.toFixed(2) +
