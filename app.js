@@ -262,20 +262,20 @@ async function processHealthData(req) {
 
   async function WeeklyUpdate() {
     var averages = await database.getAveragesThisWeek(db);
-    var message = req.headers.user + "'s Weekly Update\n";
+    var message = req.headers.user + "'s Weekly Update:";
     if (averages.AvgWeight != null) {
       var avgWeight = averages.AvgWeight.toFixed(2);
-      message += "Average Weight: " + avgWeight + " lbs\n";
+      message += "\nAverage Weight: " + avgWeight + " lbs";
     }
 
     if (averages.AvgStepCount != null) {
       var avgStepCount = averages.AvgStepCount.toFixed(2);
-      message += "Average Steps: " + avgStepCount + "\n";
+      message += "\nAverage Steps: " + avgStepCount;
     }
 
     if (averages.AvgCalories != null) {
       var avgCalories = averages.AvgCalories.toFixed(2);;
-      message += "Average Calories: " + avgCalories;
+      message += "\nAverage Calories: " + avgCalories;
     }
 
     // if (averages.AvgPhysicalEffort != null) {
@@ -291,20 +291,20 @@ async function processHealthData(req) {
 
   async function MonthlyUpdate() {
     var averages = await database.getAveragesLastMonth(db);
-    var message = req.headers.user + "'s Monthly Update\n";
+    var message = req.headers.user + "'s Monthly Update";
     if (averages.AvgWeight != null) {
       var avgWeight = averages.AvgWeight.toFixed(2);
-      message += "Average Weight: " + avgWeight + " lbs\n";
+      message += "\nAverage Weight: " + avgWeight + " lbs";
     }
 
     if (averages.AvgStepCount != null) {
       var avgStepCount = averages.AvgStepCount.toFixed(2);;
-      message += "Average Steps: " + avgStepCount + "\n";
+      message += "\nAverage Steps: " + avgStepCount;
     }
 
     if (averages.AvgCalories != null) {
       var avgCalories = averages.AvgCalories.toFixed(2);;
-      message += "Average Calories: " + avgCalories;
+      message += "\nAverage Calories: " + avgCalories;
     }
 
     // if (averages.AvgPhysicalEffort != null) {
