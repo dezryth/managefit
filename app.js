@@ -245,8 +245,9 @@ async function processHealthData(req) {
 
       if (progressPercent >= 100) {
         var today = new Date();
+        var yesterday = today.setDate(today.getDate() - 1);
         var goalStartDate = new Date(goal.StartDate);
-        var timeDifference = goalStartDate.getTime() - today.getTime();
+        var timeDifference = goalStartDate.getTime() - yesterday.getTime();
         var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
         message += "Goal has been met! Reached in " + daysDifference + " days!\nStarting next goal.";
 
