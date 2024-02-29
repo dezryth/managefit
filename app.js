@@ -11,6 +11,10 @@ const database = require("./database");
 var db = database.getDatabase();
 var quotes;
 
+var lastWorkoutsCallTime = new Date();
+var lastHealthDataCallTime = new Date();
+const API_COOLDOWN = 120;
+
 //const indexRouter = require("./routes/index");
 //const checkinRouter = require("./routes/checkin");
 
@@ -35,10 +39,18 @@ app.use(express.urlencoded({ extended: false }));
 app.post("/workouts", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
-    res.json(["POST workouts Request Received. "]);
-    //console.log(JSON.stringify(req.body.workouts));
-    processWorkouts(req);
-    insertRawRequest(req, 'workouts');
+    // Only allow endpoint to be hit once every 30 seconds.
+    if (((new Date().getTime() - lastWorkoutsCallTime.getTime()) / 1000) > API_COOLDOWN) {
+      lastWorkoutsCallTime = new Date();
+      res.json(["POST workouts Request Received. "]);
+      //console.log(JSON.stringify(req.body.workouts));
+      processWorkouts(req);
+      insertRawRequest(req, 'workouts');
+    }
+    else
+    {
+      res.json(["You must wait before the workouts endpoint can be hit again."])
+    }
   } else {
     console.log("Invalid request body received.\n" + JSON.stringify(req.body));
     res.json("Invalid request body.");
@@ -48,10 +60,18 @@ app.post("/workouts", (req, res) => {
 app.post("/healthdata", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
-    res.json(["POST healthdata Request Received. "]);
-    //console.log(JSON.stringify(req.body.data));
-    processHealthData(req);
-    insertRawRequest(req, 'healthdata');
+    // Only allow endpoint to be hit once every 30 seconds.
+    if (((new Date().getTime() - lastHealthDataCallTime.getTime()) / 1000) > API_COOLDOWN) {
+      lastHealthDataCallTime = new Date();
+      res.json(["POST healthdata Request Received. "]);
+      //console.log(JSON.stringify(req.body.data));
+      processHealthData(req);
+      insertRawRequest(req, 'healthdata');
+    }
+    else
+    {
+      res.json(["You must wait before the workouts endpoint can be hit again."])
+    }
   } else {
     console.log("Invalid request body received.\n" + JSON.stringify(req.body));
     res.json("Invalid request body.");
