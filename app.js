@@ -89,7 +89,6 @@ async function processWorkouts(req) {
   const newData = await database.validateNewData(db, date_for, 'workouts');
 
   if (newData || req.headers.override == "true") {
-    console.log('New workout data');
     // Currently expecting data for yesterday due to inconsistent syncs for "today"
     var workouts = []
 
