@@ -188,10 +188,10 @@ async function processHealthData(req) {
     weight_body_mass: weight_body_mass,
   };
 
-  // Insert health data if not already present
-  await database.insertHealthData(db, healthMetrics);
-  const newData = await database.validateNewData(db, date_for, 'healthdata');
+  // Insert or update health data for day if already present
+  await database.insertOrUpdateHealthData(db, healthMetrics);
 
+  const newData = await database.validateNewData(db, date_for, 'healthdata');
   if (newData || req.headers.override == "true") {
     DailyUpdate();
     // If today is Saturday...

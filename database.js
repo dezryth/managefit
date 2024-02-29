@@ -78,7 +78,7 @@ async function getHealthDataRow(db, date) {
   }
 }
 
-async function insertHealthData(db, healthMetrics) {
+async function insertOrUpdateHealthData(db, healthMetrics) {
   // Insert metrics data into health_data table if data for day doesn't exist, otherwise update.
   const rowId = await getHealthDataRow(db, healthMetrics.date_for);
   if (!rowId) {
@@ -255,7 +255,7 @@ module.exports = {
   createTables,
   execSql,
   getHealthDataRow,
-  insertHealthData,
+  insertOrUpdateHealthData,
   getAveragesThisWeek,
   getAveragesLastMonth,
   getCurrentGoal,
