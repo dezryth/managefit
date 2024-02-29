@@ -25,6 +25,7 @@ function createTables(newdb) {
     newdb.exec(
       `create table requests (
         id integer primary key autoincrement,
+        end_point text not null,
         request_body text not null,
         date_received datetime default current_timestamp);`
     );
@@ -41,19 +42,6 @@ function createTables(newdb) {
         vo2_max real null,
         weight_body_mass real null);`
     );
-
-    // newdb.exec(
-    //   `create table exercise (
-    //     id integer primary key autoincrement,
-    //     date_for datetime unique not null,
-    //     user text not null,
-    //     step_count integer null,
-    //     body_mass_index real null,
-    //     dietary_energy integer default 2000 null,
-    //     physical_effort real null,
-    //     vo2_max real null,
-    //     weight_body_mass real null);`
-    // );
 
     newdb.exec(
       `create table goals (
@@ -241,6 +229,26 @@ function completeGoal(db, completeDate)
   }
 }
 
+async function validateNewData(db, date_for, end_point)
+{
+  let sql = `SELECT COUNT(*) NumRows FROM requests WHERE date_received >= ? AND end_point = ?`;
+  try {
+    const row = await db.prepare(sql).get(date_for, end_point);
+    var numRows = row.NumRows;
+    //console.log(end_point, numRows, date_for);
+
+    if (numRows > 0)
+    {
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Better SQLite3 Error:", error.message);
+    reject(error);
+  }
+}
+
 module.exports = {
   getDatabase,
   createDatabase,
@@ -251,5 +259,6 @@ module.exports = {
   getAveragesThisWeek,
   getAveragesLastMonth,
   getCurrentGoal,
-  completeGoal
+  completeGoal,
+  validateNewData
 };

@@ -38,18 +38,20 @@ app.post("/workouts", (req, res) => {
     res.json(["POST workouts Request Received. "]);
     //console.log(JSON.stringify(req.body.workouts));
     processWorkouts(req);
+    insertRawRequest(req, 'workouts');
   } else {
     console.log("Invalid request body received.\n" + JSON.stringify(req.body));
     res.json("Invalid request body.");
   }
 });
 
-app.post("/data", (req, res) => {
+app.post("/healthdata", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
     res.json(["POST healthdata Request Received. "]);
     //console.log(JSON.stringify(req.body.data));
     processHealthData(req);
+    insertRawRequest(req, 'healthdata');
   } else {
     console.log("Invalid request body received.\n" + JSON.stringify(req.body));
     res.json("Invalid request body.");
@@ -83,33 +85,38 @@ function initialize() {
 }
 
 async function processWorkouts(req) {
-  // Currently expecting data for yesterday due to inconsistent syncs for "today"
-  var workouts = []
+  var date_for = new Date(req.body.data.workouts[0].start).toLocaleDateString();
+  const newData = await database.validateNewData(db, date_for, 'workouts');
 
-  req.body.data.workouts.forEach((element) => {
-    date_for = new Date(element.start);
-    workouts.push({Name: element.name, CaloriesBurned: element.activeEnergy.qty.toFixed(0)})
-  })
+  if (newData || req.headers.override == "true") {
+    console.log('New workout data');
+    // Currently expecting data for yesterday due to inconsistent syncs for "today"
+    var workouts = []
 
-  //console.log(workouts);
+    req.body.data.workouts.forEach((element) => {
+      date_for = new Date(element.start);
+      workouts.push({Name: element.name, CaloriesBurned: element.activeEnergy.qty.toFixed(0)})
+    })
 
-  if (workouts.length > 0)
-  {
-    let date_for_formatted = date_for.toISOString().split("T")[0];
-    let dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
-    let message =
-      req.headers.user +
-      "'s " +
-      getDayOfWeekName(new Date(dateWithTimezone)) + " Workouts:";
+    //console.log(workouts);
 
-    workouts.forEach((workout) => {
-      message += "\n" + workout.Name + ": " + workout.CaloriesBurned + " cals";
-    });
+    if (workouts.length > 0)
+    {
+      let date_for_formatted = date_for.toISOString().split("T")[0];
+      let dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
+      let message =
+        req.headers.user +
+        "'s " +
+        getDayOfWeekName(new Date(dateWithTimezone)) + " Workouts:";
 
-    console.log(message);
-    updateBB(message);
+      workouts.forEach((workout) => {
+        message += "\n" + workout.Name + ": " + workout.CaloriesBurned + " cals";
+      });
+
+      console.log(message);
+      updateBB(message);
+    }
   }
-
 }
 
 async function processHealthData(req) {
@@ -122,7 +129,7 @@ async function processHealthData(req) {
   var weight_body_mass = null;
 
   req.body.data.metrics.forEach((element) => {
-    date_for = new Date(element.data[0].date);
+    date_for = new Date(element.data[0].date).toLocaleDateString();
     switch (element.name) {
       case "body_mass_index":
         if (element.data[0]) {
@@ -171,10 +178,8 @@ async function processHealthData(req) {
     }
   });
 
-  var date_for_formatted = date_for.toISOString().split("T")[0];
-
   const healthMetrics = {
-    date_for: date_for_formatted,
+    date_for: date_for,
     user: req.headers.user,
     step_count: step_count,
     body_mass_index: body_mass_index,
@@ -184,17 +189,9 @@ async function processHealthData(req) {
     weight_body_mass: weight_body_mass,
   };
 
-  // Insert request into requests table
-  var insertRequestCmd =
-    `
-    insert into requests (request_body)
-    values ('` +
-    JSON.stringify(req.body) +
-    `');`;
-  database.execSql(db, insertRequestCmd);
-
   // Insert health data if not already present
-  const newData = await database.insertHealthData(db, healthMetrics);
+  await database.insertHealthData(db, healthMetrics);
+  const newData = await database.validateNewData(db, date_for, 'healthdata');
 
   if (newData || req.headers.override == "true") {
     DailyUpdate();
@@ -318,6 +315,13 @@ async function processHealthData(req) {
     console.log(message);
     updateBB(message);
   }
+}
+
+function insertRawRequest(req, endpoint) {
+  var insertRequestCmd = `
+    insert into requests (end_point, request_body)
+    values ('` + endpoint + `', '` + JSON.stringify(req.body) + `');`;
+  database.execSql(db, insertRequestCmd);
 }
 
 function getInspiration() {
