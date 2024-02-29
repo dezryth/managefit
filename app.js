@@ -86,9 +86,10 @@ function initialize() {
 
 async function processWorkouts(req) {
   var date_for = new Date(req.body.data.workouts[0].start).toLocaleDateString();
+  var yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString();
   const newData = await database.validateNewData(db, date_for, 'workouts');
 
-  if (newData || req.headers.override == "true") {
+  if ((newData && date_for == yesterday) || req.headers.override == "true") {
     // Currently expecting data for yesterday due to inconsistent syncs for "today"
     var workouts = []
 
@@ -240,8 +241,7 @@ async function processHealthData(req) {
         "%\n";
 
       if (progressPercent >= 100) {
-        var today = new Date();
-        var yesterday = today.setDate(today.getDate() - 1);
+        var yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
         var goalStartDate = new Date(goal.StartDate);
         var timeDifference = goalStartDate.getTime() - yesterday.getTime();
         var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
