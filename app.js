@@ -13,7 +13,7 @@ var quotes;
 
 var lastWorkoutsCallTime = new Date();
 var lastHealthDataCallTime = new Date();
-const API_COOLDOWN = 120;
+const API_COOLDOWN = 20;
 
 //const indexRouter = require("./routes/index");
 //const checkinRouter = require("./routes/checkin");
@@ -49,6 +49,7 @@ app.post("/workouts", (req, res) => {
     }
     else
     {
+      console.log("workouts endpoint hit before cooldown ended");
       res.json(["You must wait before the workouts endpoint can be hit again."])
     }
   } else {
@@ -70,6 +71,7 @@ app.post("/healthdata", (req, res) => {
     }
     else
     {
+       console.log("healthdata endpoint hit before cooldown ended");
       res.json(["You must wait before the workouts endpoint can be hit again."])
     }
   } else {
