@@ -218,7 +218,7 @@ function completeGoal(db, completeDate)
   var completeGoalCmd = `
     UPDATE goals
     SET
-      completeDate = ?
+      completed_date = ?
     WHERE
     completed_date IS NULL ORDER BY id ASC LIMIT 1;`;
 
@@ -233,9 +233,9 @@ async function validateNewData(db, date_for, end_point)
 {
   let sql = `SELECT COUNT(*) NumRows FROM requests WHERE date_received >= ? AND end_point = ?`;
   try {
-    const row = await db.prepare(sql).get(date_for, end_point);
+    const row = await db.prepare(sql).get(date_for.toISOString(), end_point);
     var numRows = row.NumRows;
-    //console.log(end_point, numRows, date_for);
+    console.log(end_point, numRows, date_for);
 
     if (numRows > 0)
     {
