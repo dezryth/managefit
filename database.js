@@ -213,8 +213,9 @@ async function getCurrentGoal(db)
   }
 }
 
-function completeGoal(db, completeDate)
+function completeGoal(db, completed_date)
 {
+  completeDate = new Date(completed_date).toISOString().split("T")[0];
   var completeGoalCmd = `
     UPDATE goals
     SET
@@ -223,7 +224,7 @@ function completeGoal(db, completeDate)
     completed_date IS NULL ORDER BY id ASC LIMIT 1;`;
 
   try {
-    const exec = db.prepare(completeGoalCmd).run(completeDate);
+    const exec = db.prepare(completeGoalCmd).run(completed_date);
   } catch (error) {
     console.error("Better SQLite3 Error:", error.message);
   }
