@@ -231,9 +231,10 @@ function completeGoal(db, completeDate)
 
 async function validateNewData(db, date_for, end_point)
 {
+  date_for = new Date(date_for).toISOString().split("T")[0];
   let sql = `SELECT COUNT(*) NumRows FROM requests WHERE date_received >= ? AND end_point = ?`;
   try {
-    const row = await db.prepare(sql).get(new Date(date_for).toISOString(), end_point);
+    const row = await db.prepare(sql).get(date_for, end_point);
     var numRows = row.NumRows;
     console.log(end_point, numRows, date_for);
 
