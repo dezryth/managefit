@@ -226,7 +226,7 @@ async function processHealthData(req) {
 
   async function DailyUpdate() {
     let goal = await database.getCurrentGoal(db);
-    var dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
+    var dateWithTimezone = date_for + "T00:00:00-06:00";
     var message =
       req.headers.user +
       "'s " +
