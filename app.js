@@ -226,11 +226,10 @@ async function processHealthData(req) {
 
   async function DailyUpdate() {
     let goal = await database.getCurrentGoal(db);
-    var dateWithTimezone = date_for + "T00:00:00-06:00";
     var message =
       req.headers.user +
       "'s " +
-      getDayOfWeekName(new Date(dateWithTimezone)) +
+      getDayOfWeekName(date_for) +
       ":\n";
     if (healthMetrics.step_count != null)
       message += "Steps: " + healthMetrics.step_count + "\n";
