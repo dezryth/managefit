@@ -11,9 +11,10 @@ const database = require("./database");
 var db = database.getDatabase();
 var quotes;
 
-var lastWorkoutsCallTime = new Date();
-var lastHealthDataCallTime = new Date();
+var lastWorkoutsCallTime = '';
+var lastHealthDataCallTime = '';
 const API_COOLDOWN = 20;
+const TEST_MODE = false;
 
 //const indexRouter = require("./routes/index");
 //const checkinRouter = require("./routes/checkin");
@@ -40,7 +41,7 @@ app.post("/workouts", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
     // Only allow endpoint to be hit once every 30 seconds.
-    if (((new Date().getTime() - lastWorkoutsCallTime.getTime()) / 1000) > API_COOLDOWN) {
+    if (lastWorkoutsCallTime.length === 0 || (((new Date().getTime() - lastWorkoutsCallTime.getTime()) / 1000) > API_COOLDOWN)) {
       lastWorkoutsCallTime = new Date();
       res.json(["POST workouts Request Received. "]);
       //console.log(JSON.stringify(req.body.workouts));
@@ -62,7 +63,7 @@ app.post("/healthdata", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
     // Only allow endpoint to be hit once every 30 seconds.
-    if (((new Date().getTime() - lastHealthDataCallTime.getTime()) / 1000) > API_COOLDOWN) {
+    if (lastHealthDataCallTime.length === 0 || (((new Date().getTime() - lastHealthDataCallTime.getTime()) / 1000) > API_COOLDOWN)) {
       lastHealthDataCallTime = new Date();
       res.json(["POST healthdata Request Received. "]);
       //console.log(JSON.stringify(req.body.data));
@@ -136,7 +137,6 @@ async function processWorkouts(req) {
         message += "\n" + workout.Name + ": " + workout.CaloriesBurned + " cals";
       });
 
-      console.log(message);
       updateBB(message);
     }
   }
@@ -229,7 +229,7 @@ async function processHealthData(req) {
     var message =
       req.headers.user +
       "'s " +
-      getDayOfWeekName(date_for) +
+      getDayOfWeekName(new Date(date_for)) +
       ":\n";
     if (healthMetrics.step_count != null)
       message += "Steps: " + healthMetrics.step_count + "\n";
@@ -275,7 +275,7 @@ async function processHealthData(req) {
 
     // Append inspiration
     message += getInspiration();
-    console.log(message);
+
     updateBB(message);
   }
 
@@ -304,7 +304,6 @@ async function processHealthData(req) {
 
     // message += "Share a check in at:" + process.env.CHECKIN_URL;
 
-    console.log(message);
     updateBB(message);
   }
 
@@ -333,7 +332,6 @@ async function processHealthData(req) {
 
     // message += "Share a check in at:" + process.env.CHECKIN_URL;
 
-    console.log(message);
     updateBB(message);
   }
 }
@@ -430,6 +428,7 @@ function getDayOfWeekName(date) {
 // }
 
 function updateBB(message) {
+  console.log(message);
   var afterHours = new Date();
   afterHours.setHours(21);
   afterHours.setMinutes(0);
@@ -438,6 +437,12 @@ function updateBB(message) {
   // If current time is after the normal schedule time, cancel update.
   if (new Date() > afterHours) {
     console.log("Sync came in after hours - too late to send message.");
+    return;
+  }
+
+  if (TEST_MODE)
+  {
+    console.log("Currently in test mode. Not sending messages to BB Server.");
     return;
   }
 
