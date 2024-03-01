@@ -14,7 +14,7 @@ var quotes;
 var lastWorkoutsCallTime = '';
 var lastHealthDataCallTime = '';
 const API_COOLDOWN = 20;
-const TEST_MODE = false;
+const TEST_MODE = process.env.TEST_MODE;
 
 //const indexRouter = require("./routes/index");
 //const checkinRouter = require("./routes/checkin");
@@ -265,7 +265,7 @@ async function processHealthData(req) {
       if (progressPercent >= 100) {
         var yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
         var goalStartDate = new Date(goal.StartDate);
-        var timeDifference = goalStartDate.getTime() - yesterday.getTime();
+        var timeDifference = yesterday.getTime() - goalStartDate.getTime();
         var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
         message += "Goal has been met! Reached in " + daysDifference + " days!\nStarting next goal.";
 
