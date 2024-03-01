@@ -106,8 +106,9 @@ function initialize() {
 
 async function processWorkouts(req) {
   var date_for = new Date(req.body.data.workouts[0].start).toLocaleDateString();
+  var today = new Date().toLocaleDateString();
   var yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString();
-  const newData = await database.validateNewData(db, date_for, 'workouts');
+  const newData = await database.validateNewData(db, today, 'workouts');
 
   if ((newData && date_for == yesterday) || req.headers.override == "true") {
     // Currently expecting data for yesterday due to inconsistent syncs for "today"
@@ -211,8 +212,8 @@ async function processHealthData(req) {
 
   // Insert or update health data for day if already present
   await database.insertOrUpdateHealthData(db, healthMetrics);
-
-  const newData = await database.validateNewData(db, date_for, 'healthdata');
+  var today = new Date().toLocaleDateString();
+  const newData = await database.validateNewData(db, today, 'healthdata');
   if (newData || req.headers.override == "true") {
     DailyUpdate();
     // If today is Saturday...
