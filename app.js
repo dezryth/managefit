@@ -45,7 +45,7 @@ app.post("/workouts", (req, res) => {
       lastWorkoutsCallTime = new Date();
       res.json(["POST workouts Request Received. "]);
       //console.log(JSON.stringify(req.body.workouts));
-      processWorkouts(req);
+      await processWorkouts(req);
       insertRawRequest(req, 'workouts');
     }
     else
@@ -67,7 +67,7 @@ app.post("/healthdata", (req, res) => {
       lastHealthDataCallTime = new Date();
       res.json(["POST healthdata Request Received. "]);
       //console.log(JSON.stringify(req.body.data));
-      processHealthData(req);
+      await processHealthData(req);
       insertRawRequest(req, 'healthdata');
     }
     else
