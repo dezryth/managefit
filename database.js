@@ -239,7 +239,7 @@ async function validateNewData(db, date_for, end_point)
     var numRows = row.NumRows;
     console.log(end_point, numRows, date_for);
 
-    if (numRows > 0)
+    if (numRows > 1)
     {
       return false;
     }
