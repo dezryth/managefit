@@ -194,8 +194,9 @@ async function getAveragesLastMonth(db) {
 
 async function getCurrentGoal(db)
 {
-  let sql = `SELECT start_date, start_weight, goal_weight FROM goals WHERE completed_date IS NULL ORDER BY id ASC LIMIT 1`;
+  let sql = `SELECT id, start_date, start_weight, goal_weight FROM goals WHERE completed_date IS NULL ORDER BY id ASC LIMIT 1`;
   let goal = {
+    ID: null,
     StartDate: null,
     StartWeight: null,
     GoalWeight: null,
@@ -203,6 +204,7 @@ async function getCurrentGoal(db)
 
   try {
     const row = await db.prepare(sql).get();
+    goal.ID = row.id;
     goal.StartDate = row.start_date;
     goal.StartWeight = row.start_weight;
     goal.GoalWeight = row.goal_weight;
@@ -213,18 +215,27 @@ async function getCurrentGoal(db)
   }
 }
 
-function completeGoal(db, completed_date)
+function completeGoal(db, ID, completed_date)
 {
-  completeDate = new Date(completed_date).toISOString().split("T")[0];
+  var completeDate = new Date(completed_date).toISOString().split("T")[0];
   var completeGoalCmd = `
     UPDATE goals
     SET
       completed_date = ?
     WHERE
-    completed_date IS NULL ORDER BY id ASC LIMIT 1;`;
+      id = ?`;
+
+  var startGoalCmd = `
+  UPDATE goals
+  SET
+    start_date = ?
+  WHERE
+    id = ?`
 
   try {
-    const exec = db.prepare(completeGoalCmd).run(completed_date);
+    db.prepare(completeGoalCmd).run(completeDate, ID);
+    // Update start date of next goal
+    db.prepare(startGoalCmd).run(completeDate, ID + 1);
   } catch (error) {
     console.error("Better SQLite3 Error:", error.message);
   }

@@ -269,7 +269,7 @@ async function processHealthData(req) {
         var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
         message += "Goal has been met! Reached in " + daysDifference + " days!\nStarting next goal.";
 
-        database.completeGoal(db, healthMetrics.date_for);
+        database.completeGoal(db, goal.ID, healthMetrics.date_for);
       }
     }
 
