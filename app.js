@@ -251,7 +251,7 @@ async function processHealthData(req) {
     //   message += "Weight: " + healthMetrics.weight_body_mass + " lbs\n";
 
     // Goal Check
-    if (goal.StartDate && goal.StartWeight && goal.GoalWeight) {
+    if (goal.StartWeight && goal.GoalWeight) {
       var progressPercent = ((goal.StartWeight - healthMetrics.weight_body_mass) /
         (goal.StartWeight - goal.GoalWeight)) *
         100;
