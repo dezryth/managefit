@@ -11,8 +11,8 @@ const database = require("./database");
 var db = database.getDatabase();
 var quotes;
 
-var lastWorkoutsCallTime = '';
-var lastHealthDataCallTime = '';
+var lastWorkoutsCallTime = "";
+var lastHealthDataCallTime = "";
 const API_COOLDOWN = 20;
 const TEST_MODE = process.env.TEST_MODE;
 
@@ -41,17 +41,23 @@ app.post("/workouts", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
     // Only allow endpoint to be hit once every 30 seconds.
-    if (lastWorkoutsCallTime.length === 0 || (((new Date().getTime() - lastWorkoutsCallTime.getTime()) / 1000) > API_COOLDOWN)) {
-      lastWorkoutsCallTime = new Date();
+    if (
+      lastWorkoutsCallTime.length === 0 ||
+      (getLocaleDateNow().getTime() -
+        lastWorkoutsCallTime.getTime()) /
+        1000 >
+        API_COOLDOWN
+    ) {
+      lastWorkoutsCallTime = getLocaleDateNow();
       res.json(["POST workouts Request Received. "]);
       //console.log(JSON.stringify(req.body.workouts));
       processWorkouts(req);
-      insertRawRequest(req, 'workouts');
-    }
-    else
-    {
+      insertRawRequest(req, "workouts");
+    } else {
       console.log("workouts endpoint hit before cooldown ended");
-      res.json(["You must wait before the workouts endpoint can be hit again."])
+      res.json([
+        "You must wait before the workouts endpoint can be hit again.",
+      ]);
     }
   } else {
     console.log("Invalid request body received.\n" + JSON.stringify(req.body));
@@ -63,17 +69,23 @@ app.post("/healthdata", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
     // Only allow endpoint to be hit once every 30 seconds.
-    if (lastHealthDataCallTime.length === 0 || (((new Date().getTime() - lastHealthDataCallTime.getTime()) / 1000) > API_COOLDOWN)) {
-      lastHealthDataCallTime = new Date();
+    if (
+      lastHealthDataCallTime.length === 0 ||
+      (getLocaleDateNow().getTime() -
+        lastHealthDataCallTime.getTime()) /
+        1000 >
+        API_COOLDOWN
+    ) {
+      lastHealthDataCallTime = getLocaleDateNow();
       res.json(["POST healthdata Request Received. "]);
       //console.log(JSON.stringify(req.body.data));
       processHealthData(req);
-      insertRawRequest(req, 'healthdata');
-    }
-    else
-    {
-       console.log("healthdata endpoint hit before cooldown ended");
-      res.json(["You must wait before the workouts endpoint can be hit again."])
+      insertRawRequest(req, "healthdata");
+    } else {
+      console.log("healthdata endpoint hit before cooldown ended");
+      res.json([
+        "You must wait before the workouts endpoint can be hit again.",
+      ]);
     }
   } else {
     console.log("Invalid request body received.\n" + JSON.stringify(req.body));
@@ -108,33 +120,42 @@ function initialize() {
 }
 
 async function processWorkouts(req) {
-  var date_for = new Date(req.body.data.workouts[0].start).toLocaleDateString();
-  var today = new Date().toLocaleDateString();
-  var yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString();
-  const newData = await database.validateNewData(db, today, 'workouts');
+  var date_for = new Date(req.body.data.workouts[0].start).toLocaleDateString(
+    "en-US",
+    { timeZone: "America/Chicago" }
+  );
+  var today = getLocaleDateStringNow();
+  var yesterday = new Date(
+    new Date().setDate(getLocaleDateNow().getDate() - 1)
+  ).toLocaleDateString("en-US", { timeZone: "America/Chicago" });
+  const newData = await database.validateNewData(db, today, "workouts");
 
   if ((newData && date_for == yesterday) || req.headers.override == "true") {
     // Currently expecting data for yesterday due to inconsistent syncs for "today"
-    var workouts = []
+    var workouts = [];
 
     req.body.data.workouts.forEach((element) => {
       date_for = new Date(element.start);
-      workouts.push({Name: element.name, CaloriesBurned: element.activeEnergy.qty.toFixed(0)})
-    })
+      workouts.push({
+        Name: element.name,
+        CaloriesBurned: element.activeEnergy.qty.toFixed(0),
+      });
+    });
 
     //console.log(workouts);
 
-    if (workouts.length > 0)
-    {
+    if (workouts.length > 0) {
       let date_for_formatted = date_for.toISOString().split("T")[0];
       let dateWithTimezone = date_for_formatted + "T00:00:00-06:00";
       let message =
         req.headers.user +
         "'s " +
-        getDayOfWeekName(new Date(dateWithTimezone)) + " Workouts:";
+        getDayOfWeekName(getLocaleDateNow()) +
+        " Workouts:";
 
       workouts.forEach((workout) => {
-        message += "\n" + workout.Name + ": " + workout.CaloriesBurned + " cals";
+        message +=
+          "\n" + workout.Name + ": " + workout.CaloriesBurned + " cals";
       });
 
       updateBB(message);
@@ -152,7 +173,9 @@ async function processHealthData(req) {
   var weight_body_mass = null;
 
   req.body.data.metrics.forEach((element) => {
-    date_for = new Date(element.data[0].date).toLocaleDateString();
+    date_for = new Date(element.data[0].date).toLocaleDateString("en-US", {
+      timeZone: "America/Chicago",
+    });
     switch (element.name) {
       case "body_mass_index":
         if (element.data[0]) {
@@ -183,18 +206,13 @@ async function processHealthData(req) {
         if (element.data[0]) {
           // Handle multiple weigh-ins and take lowest
           let lowestWeight = 0;
-          element.data.forEach((weighIn) =>
-          {
-            if (lowestWeight != 0)
-            {
-              if (weighIn.qty < lowestWeight)
+          element.data.forEach((weighIn) => {
+            if (lowestWeight != 0) {
+              if (weighIn.qty < lowestWeight) lowestWeight = weighIn.qty;
+            } else {
               lowestWeight = weighIn.qty;
             }
-            else
-            {
-              lowestWeight = weighIn.qty;
-            }
-          })
+          });
           weight_body_mass = lowestWeight.toFixed(2);
         }
         break;
@@ -214,23 +232,22 @@ async function processHealthData(req) {
 
   // Insert or update health data for day if already present
   await database.insertOrUpdateHealthData(db, healthMetrics);
-  var today = new Date().toLocaleDateString();
-  const newData = await database.validateNewData(db, today, 'healthdata');
+  var today = getLocaleDateStringNow();
+  const newData = await database.validateNewData(db, today, "healthdata");
   if (newData || req.headers.override == "true") {
     DailyUpdate();
     // If today is Saturday...
-    if (getDayOfWeekName(new Date()) == "Sunday") await WeeklyUpdate();
+    if (getDayOfWeekName(getLocaleDateNow()) == "Sunday")
+      await WeeklyUpdate();
     // If today is first of the month...
-    if (new Date().getDate() == 1) await MonthlyUpdate();
+    if (getLocaleDateNow().getDate() == 1)
+      await MonthlyUpdate();
   }
 
   async function DailyUpdate() {
     let goal = await database.getCurrentGoal(db);
     var message =
-      req.headers.user +
-      "'s " +
-      getDayOfWeekName(new Date(date_for)) +
-      ":\n";
+      req.headers.user + "'s " + getDayOfWeekName(new Date(date_for)) + ":\n";
     if (healthMetrics.step_count != null)
       message += "Steps: " + healthMetrics.step_count + "\n";
     if (healthMetrics.dietary_energy != null)
@@ -252,22 +269,30 @@ async function processHealthData(req) {
 
     // Goal Check
     if (healthMetrics.weight_body_mass && goal.StartWeight && goal.GoalWeight) {
-      var progressPercent = ((goal.StartWeight - healthMetrics.weight_body_mass) /
-        (goal.StartWeight - goal.GoalWeight)) *
+      var progressPercent =
+        ((goal.StartWeight - healthMetrics.weight_body_mass) /
+          (goal.StartWeight - goal.GoalWeight)) *
         100;
 
-      message += "Goal: Drop from " + goal.StartWeight + " to " + goal.GoalWeight + " lbs\n";
       message +=
-        "Status: " +
-        progressPercent.toFixed(2) +
-        "%\n";
+        "Goal: Drop from " +
+        goal.StartWeight +
+        " to " +
+        goal.GoalWeight +
+        " lbs\n";
+      message += "Status: " + progressPercent.toFixed(2) + "%\n";
 
       if (progressPercent >= 100) {
-        var yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+        var yesterday = new Date(
+          new Date().setDate(getLocaleDateNow().getDate() - 1)
+        );
         var goalStartDate = new Date(goal.StartDate);
         var timeDifference = yesterday.getTime() - goalStartDate.getTime();
         var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
-        message += "Goal has been met! Reached in " + daysDifference + " days!\nStarting next goal.";
+        message +=
+          "Goal has been met! Reached in " +
+          daysDifference +
+          " days!\nStarting next goal.";
 
         database.completeGoal(db, goal.ID, healthMetrics.date_for);
       }
@@ -293,7 +318,7 @@ async function processHealthData(req) {
     }
 
     if (averages.AvgCalories != null) {
-      var avgCalories = averages.AvgCalories.toFixed(2);;
+      var avgCalories = averages.AvgCalories.toFixed(2);
       message += "\nAverage Calories: " + avgCalories;
     }
 
@@ -316,12 +341,12 @@ async function processHealthData(req) {
     }
 
     if (averages.AvgStepCount != null) {
-      var avgStepCount = averages.AvgStepCount.toFixed(2);;
+      var avgStepCount = averages.AvgStepCount.toFixed(2);
       message += "\nAverage Steps: " + avgStepCount;
     }
 
     if (averages.AvgCalories != null) {
-      var avgCalories = averages.AvgCalories.toFixed(2);;
+      var avgCalories = averages.AvgCalories.toFixed(2);
       message += "\nAverage Calories: " + avgCalories;
     }
 
@@ -337,9 +362,14 @@ async function processHealthData(req) {
 }
 
 function insertRawRequest(req, endpoint) {
-  var insertRequestCmd = `
+  var insertRequestCmd =
+    `
     insert into requests (end_point, request_body)
-    values ('` + endpoint + `', '` + JSON.stringify(req.body) + `');`;
+    values ('` +
+    endpoint +
+    `', '` +
+    JSON.stringify(req.body) +
+    `');`;
   database.execSql(db, insertRequestCmd);
 }
 
@@ -356,6 +386,18 @@ function getInspiration() {
 
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getLocaleDateNow() {
+  return new Date(new Date().toLocaleDateString("en-US", {
+    timeZone: "America/Chicago",
+  }));
+}
+
+function getLocaleDateStringNow() {
+  return new Date().toLocaleDateString("en-US", {
+    timeZone: "America/Chicago",
+  });
 }
 
 function getDayOfWeekName(date) {
@@ -429,19 +471,18 @@ function getDayOfWeekName(date) {
 
 function updateBB(message) {
   console.log(message);
-  var afterHours = new Date();
+  var afterHours = getLocaleDateNow();
   afterHours.setHours(21);
   afterHours.setMinutes(0);
   afterHours.setSeconds(0);
 
   // If current time is after the normal schedule time, cancel update.
-  if (new Date() > afterHours) {
+  if (getLocaleDateStringNow() > afterHours) {
     console.log("Sync came in after hours - too late to send message.");
     return;
   }
 
-  if (TEST_MODE)
-  {
+  if (TEST_MODE) {
     console.log("Currently in test mode. Not sending messages to BB Server.");
     return;
   }
