@@ -13,7 +13,7 @@ var quotes;
 
 var lastWorkoutsCallTime = "";
 var lastHealthDataCallTime = "";
-const API_COOLDOWN = 20;
+const API_COOLDOWN = 30;
 const TEST_MODE = process.env.TEST_MODE;
 
 //const indexRouter = require("./routes/index");
@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: false }));
 app.post("/workouts", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
-    // Only allow endpoint to be hit once every 30 seconds.
+    // Only allow endpoint to be hit after cooldown
     if (
       lastWorkoutsCallTime.length === 0 ||
       (getLocaleDateNow().getTime() -
@@ -68,7 +68,7 @@ app.post("/workouts", (req, res) => {
 app.post("/healthdata", (req, res) => {
   // Extract data from request body and store in database
   if (req.body.data) {
-    // Only allow endpoint to be hit once every 30 seconds.
+    // Only allow endpoint to be hit after cooldown.
     if (
       lastHealthDataCallTime.length === 0 ||
       (getLocaleDateNow().getTime() -
@@ -389,13 +389,13 @@ function randomInteger(min, max) {
 }
 
 function getLocaleDateNow() {
-  return new Date(new Date().toLocaleDateString("en-US", {
+  return new Date(new Date().toLocaleString("en-US", {
     timeZone: "America/Chicago",
   }));
 }
 
 function getLocaleDateStringNow() {
-  return new Date().toLocaleDateString("en-US", {
+  return new Date().toLocaleString("en-US", {
     timeZone: "America/Chicago",
   });
 }
